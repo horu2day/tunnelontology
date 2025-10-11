@@ -1,0 +1,226 @@
+# Tunneling Ontology Schema Definition
+# 이 파일은 NATM 터널 막장 굴착 프로세스 온톨로지의 스키마(청사진)를 정의합니다.
+
+# -- 접두사(Prefix) 정의 --
+@prefix : <http://example.org/tunneling-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# -- 최상위 클래스(Top-level Classes) --
+
+:TunnelingCycle rdf:type owl:Class ;
+    rdfs:label "터널링 사이클"@ko, "Tunneling Cycle"@en ;
+    rdfs:comment "NATM 공법의 완전한 굴착 사이클. 천공, 장약, 발파, 환기, 버력처리, 지보재 설치의 6단계로 구성됩니다."@ko .
+
+:ProcessStage rdf:type owl:Class ;
+    rdfs:label "공정 단계"@ko, "Process Stage"@en ;
+    rdfs:comment "굴착 사이클 내의 개별 작업 단계"@ko .
+
+# -- 6개 NATM 단계 (ProcessStage의 하위 클래스) --
+
+:Drilling rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "천공"@ko, "Drilling"@en ;
+    rdfs:comment "천공기를 이용해 굴착 예정 막장면에 구멍을 뚫는 단계. 심빼기공, 주변공, 보조공 등을 포함합니다."@ko .
+
+:Charging rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "장약"@ko, "Charging"@en ;
+    rdfs:comment "천공된 구멍에 폭약을 넣고 뇌관을 설치하는 단계"@ko .
+
+:Blasting rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "발파"@ko, "Blasting"@en ;
+    rdfs:comment "장약이 완료된 후 안전지대로 대피하여 폭약을 터뜨리는 작업"@ko .
+
+:Ventilation rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "환기"@ko, "Ventilation"@en ;
+    rdfs:comment "발파 후 발생하는 유해가스와 분진을 외부로 배출하는 과정"@ko .
+
+:Mucking rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "버력처리"@ko, "Mucking"@en ;
+    rdfs:comment "환기 후 굴착된 암석 조각(버력)을 로더 등의 장비를 이용해 밖으로 운반하는 작업"@ko .
+
+:SupportInstallation rdf:type owl:Class ;
+    rdfs:subClassOf :ProcessStage ;
+    rdfs:label "지보재 설치"@ko, "Support Installation"@en ;
+    rdfs:comment "막장면 관찰 후 붕괴 방지를 위해 숏크리트, 락볼트, 강지보재 등을 설치하는 단계"@ko .
+
+# -- 장비 클래스 (Equipment Classes) --
+
+:Equipment rdf:type owl:Class ;
+    rdfs:label "장비"@ko, "Equipment"@en ;
+    rdfs:comment "터널 굴착 과정에서 사용되는 모든 기계 및 장비"@ko .
+
+:DrillingMachine rdf:type owl:Class ;
+    rdfs:subClassOf :Equipment ;
+    rdfs:label "천공기"@ko, "Drilling Machine"@en ;
+    rdfs:comment "막장면에 구멍을 뚫는 데 사용되는 장비"@ko .
+
+:Loader rdf:type owl:Class ;
+    rdfs:subClassOf :Equipment ;
+    rdfs:label "로더"@ko, "Loader"@en ;
+    rdfs:comment "버력을 적재하고 운반하는 장비"@ko .
+
+:ShotcreteEquipment rdf:type owl:Class ;
+    rdfs:subClassOf :Equipment ;
+    rdfs:label "숏크리트 장비"@ko, "Shotcrete Equipment"@en ;
+    rdfs:comment "숏크리트를 분사하는 장비"@ko .
+
+# -- 천공 관련 클래스 --
+
+:DrillHole rdf:type owl:Class ;
+    rdfs:label "천공 구멍"@ko, "Drill Hole"@en ;
+    rdfs:comment "천공 작업으로 생성된 구멍"@ko .
+
+:CutHole rdf:type owl:Class ;
+    rdfs:subClassOf :DrillHole ;
+    rdfs:label "심빼기공"@ko, "Cut Hole"@en ;
+    rdfs:comment "터널 중심부의 암석을 먼저 파쇄하기 위한 구멍. 발파 시 자유면을 만들어 발파 효율을 높입니다."@ko .
+
+:PerimeterHole rdf:type owl:Class ;
+    rdfs:subClassOf :DrillHole ;
+    rdfs:label "주변공"@ko, "Perimeter Hole"@en ;
+    rdfs:comment "터널의 최종 단면을 형성하기 위해 외곽에 뚫는 구멍"@ko .
+
+:HelperHole rdf:type owl:Class ;
+    rdfs:subClassOf :DrillHole ;
+    rdfs:label "보조공"@ko, "Helper Hole"@en ;
+    rdfs:comment "주변공과 심빼기공 사이에 뚫어 폭약의 효과가 터널 전면에 고르게 미치도록 하는 구멍"@ko .
+
+# -- 폭약 클래스 --
+
+:Explosive rdf:type owl:Class ;
+    rdfs:label "폭약"@ko, "Explosive"@en ;
+    rdfs:comment "천공 구멍에 장약되는 폭발물"@ko .
+
+# -- 지보재 클래스 (Support Member Classes) --
+
+:SupportMember rdf:type owl:Class ;
+    rdfs:label "지보재"@ko, "Support Member"@en ;
+    rdfs:comment "터널 안정성 확보를 위해 설치되는 구조물"@ko .
+
+:Shotcrete rdf:type owl:Class ;
+    rdfs:subClassOf :SupportMember ;
+    rdfs:label "숏크리트"@ko, "Shotcrete"@en ;
+    rdfs:comment "굴착면의 표면을 보강하고 풍화를 방지하며 지반 이완을 억제하는 콘크리트 분사 공법"@ko .
+
+:RockBolt rdf:type owl:Class ;
+    rdfs:subClassOf :SupportMember ;
+    rdfs:label "락볼트"@ko, "Rock Bolt"@en ;
+    rdfs:comment "천공 후 강봉을 삽입하여 암반을 고정함으로써 터널의 안정성을 높이는 지보재"@ko .
+
+:LatticeGirder rdf:type owl:Class ;
+    rdfs:subClassOf :SupportMember ;
+    rdfs:label "강지보재"@ko, "Lattice Girder"@en ;
+    rdfs:comment "격자형의 강재를 설치하여 터널 단면을 보강하는 지보재"@ko .
+
+# -- 데이터 속성 (Datatype Properties) --
+
+:cycleNumber rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TunnelingCycle ;
+    rdfs:range xsd:integer ;
+    rdfs:label "사이클 번호"@ko, "Cycle Number"@en ;
+    rdfs:comment "터널 굴착 사이클의 순차적 번호"@ko .
+
+:advanceLength rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TunnelingCycle ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "굴진장"@ko, "Advance Length"@en ;
+    rdfs:comment "한 사이클에서 전진한 거리 (미터 단위)"@ko .
+
+:startTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :ProcessStage ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "시작 시간"@ko, "Start Time"@en ;
+    rdfs:comment "공정 단계가 시작된 시간"@ko .
+
+:endTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :ProcessStage ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "종료 시간"@ko, "End Time"@en ;
+    rdfs:comment "공정 단계가 종료된 시간"@ko .
+
+:holeDepth rdf:type owl:DatatypeProperty ;
+    rdfs:domain :DrillHole ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "구멍 깊이"@ko, "Hole Depth"@en ;
+    rdfs:comment "천공 구멍의 깊이 (미터 단위)"@ko .
+
+:holeType rdf:type owl:DatatypeProperty ;
+    rdfs:domain :DrillHole ;
+    rdfs:range xsd:string ;
+    rdfs:label "구멍 유형"@ko, "Hole Type"@en ;
+    rdfs:comment "천공 구멍의 유형 (심빼기공, 주변공, 보조공 등)"@ko .
+
+:shotcreteThickness rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Shotcrete ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "숏크리트 두께"@ko, "Shotcrete Thickness"@en ;
+    rdfs:comment "분사된 숏크리트의 두께 (밀리미터 단위)"@ko .
+
+:boltLength rdf:type owl:DatatypeProperty ;
+    rdfs:domain :RockBolt ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "볼트 길이"@ko, "Bolt Length"@en ;
+    rdfs:comment "락볼트의 길이 (미터 단위)"@ko .
+
+:equipmentId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Equipment ;
+    rdfs:range xsd:string ;
+    rdfs:label "장비 ID"@ko, "Equipment ID"@en ;
+    rdfs:comment "장비의 고유 식별자"@ko .
+
+# -- 객체 속성 (Object Properties / Link Types) --
+
+:hasStage rdf:type owl:ObjectProperty ;
+    rdfs:domain :TunnelingCycle ;
+    rdfs:range :ProcessStage ;
+    rdfs:label "단계 포함"@ko, "Has Stage"@en ;
+    rdfs:comment "터널링 사이클이 특정 공정 단계를 포함함"@ko .
+
+:precedes rdf:type owl:ObjectProperty ;
+    rdfs:domain :ProcessStage ;
+    rdfs:range :ProcessStage ;
+    rdfs:label "선행 단계"@ko, "Precedes"@en ;
+    rdfs:comment "한 공정 단계가 다른 공정 단계에 선행함. A precedes B는 A가 B보다 먼저 발생함을 의미합니다."@en .
+
+:createsHole rdf:type owl:ObjectProperty ;
+    rdfs:domain :Drilling ;
+    rdfs:range :DrillHole ;
+    rdfs:label "구멍 생성"@ko, "Creates Hole"@en ;
+    rdfs:comment "천공 작업이 천공 구멍을 생성함"@ko .
+
+:isChargedWith rdf:type owl:ObjectProperty ;
+    rdfs:domain :DrillHole ;
+    rdfs:range :Explosive ;
+    rdfs:label "장약됨"@ko, "Is Charged With"@en ;
+    rdfs:comment "천공 구멍에 폭약이 장약됨"@ko .
+
+:detonates rdf:type owl:ObjectProperty ;
+    rdfs:domain :Blasting ;
+    rdfs:range :Explosive ;
+    rdfs:label "기폭"@ko, "Detonates"@en ;
+    rdfs:comment "발파 작업이 폭약을 기폭함"@ko .
+
+:installsSupport rdf:type owl:ObjectProperty ;
+    rdfs:domain :SupportInstallation ;
+    rdfs:range :SupportMember ;
+    rdfs:label "지보재 설치"@ko, "Installs Support"@en ;
+    rdfs:comment "지보재 설치 작업이 지보재를 설치함"@ko .
+
+:usesEquipment rdf:type owl:ObjectProperty ;
+    rdfs:domain :ProcessStage ;
+    rdfs:range :Equipment ;
+    rdfs:label "장비 사용"@ko, "Uses Equipment"@en ;
+    rdfs:comment "공정 단계가 특정 장비를 사용함"@ko .
+
+:removesDebris rdf:type owl:ObjectProperty ;
+    rdfs:domain :Mucking ;
+    rdfs:range :Equipment ;
+    rdfs:label "버력 제거"@ko, "Removes Debris"@en ;
+    rdfs:comment "버력처리 작업이 로더 등의 장비를 사용하여 버력을 제거함"@ko .

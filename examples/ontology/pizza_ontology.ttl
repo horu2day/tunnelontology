@@ -1,0 +1,91 @@
+# -- 접두사(Prefix) 정의 --
+# 이 온톨로지에서 사용할 용어들을 짧게 쓰기 위한 약속입니다.
+ @prefix : <http://example.org/pizza-ontology#> .
+ @prefix owl: <http://www.w3.org/2002/07/owl#> .
+ @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+ @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+ @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# -- 클래스(Object Types) 정의 --
+# 현실 세계의 엔티티를 클래스로 정의합니다.
+:PizzaOrder rdf:type owl:Class ;
+    rdfs:label "Pizza Order" ;
+    rdfs:comment "A customer's order for one or more pizzas." .
+
+:Pizza rdf:type owl:Class ;
+    rdfs:label "Pizza" .
+
+:Ingredient rdf:type owl:Class ;
+    rdfs:label "Ingredient" .
+
+:Oven rdf:type owl:Class ;
+    rdfs:label "Oven" .
+
+:Employee rdf:type owl:Class ;
+    rdfs:label "Employee" .
+
+# -- 데이터 속성(Datatype Properties) 정의 --
+# 객체가 문자열, 숫자, 날짜 등 실제 데이터 값을 갖는 속성입니다.
+:orderId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :PizzaOrder ;    # 이 속성은 PizzaOrder 클래스에 속합니다.
+    rdfs:range xsd:string .      # 이 속성의 값은 문자열(string) 타입입니다.
+
+:orderStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain :PizzaOrder ;
+    rdfs:range xsd:string .
+
+:recipeName rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Pizza ;
+    rdfs:range xsd:string .
+
+:currentStock rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Ingredient ;
+    rdfs:range xsd:integer .     # 재고량은 정수(integer) 타입입니다.
+
+:currentTemp rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Oven ;
+    rdfs:range xsd:decimal .
+
+:employeeName rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Employee ;
+    rdfs:range xsd:string .
+
+# -- 객체 속성(Object Properties / Link Types) 정의 --
+# 한 객체(주어)가 다른 객체(목표어)와 관계를 맺는 속성입니다.
+:includesPizza rdf:type owl:ObjectProperty ;
+    rdfs:domain :PizzaOrder ;    # 주어는 PizzaOrder 입니다.
+    rdfs:range :Pizza .          # 목표어는 Pizza 입니다. (주문은 피자를 포함한다)
+
+:usesIngredient rdf:type owl:ObjectProperty ;
+    rdfs:domain :Pizza ;
+    rdfs:range :Ingredient .     # (피자는 재료를 사용한다)
+
+:isCookedBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :Pizza ;
+    rdfs:range :Employee .       # (피자는 직원에 의해 조리된다)
+
+:isBakedIn rdf:type owl:ObjectProperty ;
+    rdfs:domain :Pizza ;
+    rdfs:range :Oven .           # (피자는 오븐에서 구워진다)
+
+# -- 액션 클래스 정의 --
+:BakingAction rdf:type owl:Class ;
+    rdfs:comment "A record of a pizza being baked." .
+
+# -- 액션과 관련된 객체 속성 정의 --
+:executedBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :BakingAction ;
+    rdfs:range :Employee .
+
+:targetPizza rdf:type owl:ObjectProperty ;
+    rdfs:domain :BakingAction ;
+    rdfs:range :Pizza .
+
+:usedOven rdf:type owl:ObjectProperty ;
+    rdfs:domain :BakingAction ;
+    rdfs:range :Oven .
+
+# -- 액션과 관련된 데이터 속성 정의 --
+:actionStartTime rdf:type owl:DatatypeProperty ;
+    rdfs:domain :BakingAction ;
+    rdfs:range xsd:dateTime .

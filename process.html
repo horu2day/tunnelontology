@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로세스 타임라인 | Tunnel Process Timeline</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/process-timeline.css">
+    <!-- Vis.js Timeline from CDN -->
+    <link href="https://unpkg.com/vis-timeline@7.7.2/dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/vis-timeline@7.7.2/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <!-- N3.js from CDN -->
+    <script src="https://unpkg.com/n3@1.17.0/browser/n3.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🚇 터널 굴착 프로세스 타임라인</h1>
+                <p class="subtitle">NATM Excavation Cycle Timeline Visualization</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">온톨로지 뷰어</a>
+                <a href="process.html" class="nav-link active">프로세스 타임라인</a>
+            </nav>
+        </header>
+
+        <!-- 로딩 인디케이터 -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>타임라인 로딩 중...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-box">
+                <h3>⚠️ 오류 발생</h3>
+                <p id="error-message"></p>
+            </div>
+        </div>
+
+        <!-- 메인 컨테이너 -->
+        <div class="main-container timeline-layout">
+            <!-- 좌측: 사이클 리스트 -->
+            <aside class="sidebar">
+                <div class="panel-header">
+                    <h2>굴착 사이클</h2>
+                </div>
+                <div class="panel-content">
+                    <ul id="cycle-list" class="cycle-list">
+                        <p class="placeholder">사이클 로딩 중...</p>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 중앙: 타임라인 -->
+            <main class="main-content">
+                <div class="panel-header">
+                    <h2>시간 흐름 시각화</h2>
+                    <div class="timeline-controls">
+                        <button id="btn-fit" class="btn btn-small">전체 보기</button>
+                        <button id="btn-zoom-in" class="btn btn-small">확대 (+)</button>
+                        <button id="btn-zoom-out" class="btn btn-small">축소 (-)</button>
+                    </div>
+                </div>
+                <div id="timeline-container" class="timeline-container"></div>
+
+                <!-- 범례 -->
+                <div class="legend">
+                    <h3>공정 단계</h3>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #3498db;"></span>
+                            <span>천공 (Drilling)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #f39c12;"></span>
+                            <span>장약 (Charging)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #e74c3c;"></span>
+                            <span>발파 (Blasting)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #9b59b6;"></span>
+                            <span>환기 (Ventilation)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #1abc9c;"></span>
+                            <span>버력처리 (Mucking)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #2ecc71;"></span>
+                            <span>지보재 설치 (Support)</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 우측: 상세 정보 -->
+            <aside class="sidebar sidebar-right">
+                <div class="panel-header">
+                    <h2>상세 정보</h2>
+                </div>
+                <div id="detail-panel" class="panel-content">
+                    <p class="placeholder">단계를 선택하세요</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Tunnel Ontology Project | NATM Excavation Process Visualization</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { parseTurtleFile, parseMultipleTurtleFiles } from './src/parsers/turtle-parser.js';
+        import { renderCycleTimeline, getCycleDetails, getStageDetails } from './src/visualizers/cycle-timeline.js';
+        import { toggleLoading, showError, formatDateTime, calculateDuration, formatDuration } from './src/utils/formatters.js';
+
+        let timelineInstance = null;
+        let store = null;
+
+        // 앱 초기화
+        document.addEventListener('DOMContentLoaded', async function initApp() {
+            try {
+                console.log('Loading ontology data...');
+                toggleLoading(true);
+
+                // 스키마와 인스턴스 데이터 로드
+                const result = await parseMultipleTurtleFiles([
+                    'src/ontology/tunneling_schema.ttl',
+                    'src/ontology/tunnel_instances.ttl'
+                ]);
+
+                store = result.store;
+                console.log('✓ Ontology data loaded successfully');
+
+                // 사이클 리스트 렌더링
+                renderCycleList(store);
+
+                // 타임라인 렌더링
+                timelineInstance = renderCycleTimeline(store, 'timeline-container');
+
+                // 컨트롤 버튼 설정
+                setupControls();
+
+                // 단계 선택 이벤트 리스너
+                document.addEventListener('stageSelected', (event) => {
+                    renderStageDetails(event.detail.uri);
+                });
+
+                toggleLoading(false);
+                console.log('✓ Application initialized successfully');
+            } catch (error) {
+                console.error('✗ Failed to initialize application:', error);
+                showError(`온톨로지 로드 실패: ${error.message}`);
+                toggleLoading(false);
+            }
+        });
+
+        // 사이클 리스트 렌더링
+        function renderCycleList(store) {
+            const cycleList = document.getElementById('cycle-list');
+            cycleList.innerHTML = '';
+
+            // TunnelingCycle 인스턴스 찾기
+            const TUNNEL_NS = 'http://example.org/tunneling-ontology#';
+            const cycleQuads = store.getQuads(null, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type', `${TUNNEL_NS}TunnelingCycle`);
+
+            if (cycleQuads.length === 0) {
+                cycleList.innerHTML = '<p class="placeholder">사이클이 없습니다</p>';
+                return;
+            }
+
+            cycleQuads.forEach(quad => {
+                const cycleUri = quad.subject.value;
+                const details = getCycleDetails(store, cycleUri);
+
+                const li = document.createElement('li');
+                li.className = 'cycle-item';
+                li.innerHTML = `
+                    <div class="cycle-icon"></div>
+                    <div class="cycle-info">
+                        <strong>Cycle ${details.cycleNumber}</strong>
+                        <span>${details.advanceLength}m 전진</span>
+                        <span>${details.stages.length}개 단계</span>
+                    </div>
+                `;
+
+                li.addEventListener('click', () => {
+                    renderCycleDetails(cycleUri);
+                });
+
+                cycleList.appendChild(li);
+            });
+        }
+
+        // 사이클 상세 정보 렌더링
+        function renderCycleDetails(cycleUri) {
+            const details = getCycleDetails(store, cycleUri);
+            const detailPanel = document.getElementById('detail-panel');
+
+            let html = `
+                <div class="detail-card">
+                    <h3>Cycle ${details.cycleNumber}</h3>
+                    <p><strong>전진장:</strong> ${details.advanceLength} m</p>
+                    <p><strong>단계 수:</strong> ${details.stages.length}개</p>
+
+                    <h4>공정 단계</h4>
+                    <ul class="stage-list">
+            `;
+
+            details.stages.forEach(stage => {
+                const duration = calculateDuration(stage.startTime, stage.endTime);
+                html += `
+                    <li class="stage-item">
+                        <strong>${stage.label}</strong>
+                        <span>${formatDateTime(stage.startTime)}</span>
+                        <span>소요: ${formatDuration(duration)}</span>
+                    </li>
+                `;
+            });
+
+            html += `
+                    </ul>
+                </div>
+            `;
+
+            detailPanel.innerHTML = html;
+        }
+
+        // 단계 상세 정보 렌더링
+        function renderStageDetails(stageUri) {
+            const details = getStageDetails(store, stageUri);
+            const detailPanel = document.getElementById('detail-panel');
+
+            const duration = calculateDuration(details.startTime, details.endTime);
+
+            let html = `
+                <div class="detail-card">
+                    <h3>${details.label}</h3>
+                    <p><strong>시작:</strong> ${formatDateTime(details.startTime)}</p>
+                    <p><strong>종료:</strong> ${formatDateTime(details.endTime)}</p>
+                    <p><strong>소요 시간:</strong> ${formatDuration(duration)}</p>
+            `;
+
+            if (details.equipment.length > 0) {
+                html += '<h4>사용 장비</h4><ul>';
+                details.equipment.forEach(eq => {
+                    html += `<li>${eq.label || eq.uri}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (details.outputs.length > 0) {
+                html += '<h4>생성물/결과</h4><ul>';
+                details.outputs.forEach(out => {
+                    html += `<li>${out.predicate}: ${out.label || out.uri}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            html += '</div>';
+            detailPanel.innerHTML = html;
+        }
+
+        // 타임라인 컨트롤 설정
+        function setupControls() {
+            document.getElementById('btn-fit').addEventListener('click', () => {
+                if (timelineInstance) {
+                    timelineInstance.fit();
+                }
+            });
+
+            document.getElementById('btn-zoom-in').addEventListener('click', () => {
+                if (timelineInstance) {
+                    timelineInstance.zoomIn(0.2);
+                }
+            });
+
+            document.getElementById('btn-zoom-out').addEventListener('click', () => {
+                if (timelineInstance) {
+                    timelineInstance.zoomOut(0.2);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

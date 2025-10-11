@@ -1,0 +1,44 @@
+# -- 접두사(Prefix) 정의 (스키마와 동일) --
+ @prefix : <http://example.org/pizza-ontology#> .
+ @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+ @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# -- 개별 객체(Object Instances) 생성 --
+
+# 주문 #123 객체
+:order123 rdf:type :PizzaOrder ;
+    :orderId "ORD-123" ;
+    :orderStatus "조리중" ;
+    :includesPizza :pepperoniPizza456 .  # 이 주문은 pepperoniPizza456 객체를 포함합니다.
+
+# 피자 #456 객체
+:pepperoniPizza456 rdf:type :Pizza ;
+    :recipeName "페퍼로니 피자" ;
+    :usesIngredient :ingredient_dough, :ingredient_cheese, :ingredient_pepperoni ; # 여러 재료를 사용
+    :isCookedBy :employee_kim ;         # 김대리(employee_kim)가 조리
+    :isBakedIn :oven01 .                # 오븐 #1(oven01)에서 구워짐
+
+# 재료 객체들
+:ingredient_dough rdf:type :Ingredient ;
+    :currentStock 10000 . # 단위: g
+
+:ingredient_cheese rdf:type :Ingredient ;
+    :currentStock 5000 .
+
+:ingredient_pepperoni rdf:type :Ingredient ;
+    :currentStock 2500 .
+
+# 직원 객체
+:employee_kim rdf:type :Employee ;
+    :employeeName "김대리" .
+
+# 오븐 객체
+:oven01 rdf:type :Oven ;
+    :currentTemp 250.5 .
+
+# -- 액션 객체(Instance) 생성 --
+:bakingAction_789 rdf:type :BakingAction ;
+    :executedBy :employee_kim ;         # 누가 실행했는가? -> 김대리
+    :targetPizza :pepperoniPizza456 ;   # 어떤 피자를 대상으로? -> 페퍼로니 피자
+    :usedOven :oven01 ;                 # 어떤 오븐을 사용했나? -> 오븐 #1
+    :actionStartTime "2025-10-11T18:30:00Z"^^xsd:dateTime . # 언제 시작했는가?

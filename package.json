@@ -1,0 +1,31 @@
+{
+  "name": "tunnel-ontology-visualization",
+  "version": "1.0.0",
+  "description": "NATM Tunnel Excavation Ontology & Visualization System",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 8080 -o",
+    "lint": "eslint src/**/*.js",
+    "test": "echo \"No tests configured yet\" && exit 0"
+  },
+  "keywords": [
+    "ontology",
+    "owl",
+    "rdf",
+    "turtle",
+    "tunnel",
+    "natm",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cytoscape": "^3.26.0",
+    "n3": "^1.17.0",
+    "vis-timeline": "^7.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "http-server": "^14.1.1"
+  }
+}

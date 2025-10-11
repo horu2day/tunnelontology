@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>터널 온톨로지 뷰어 | Tunnel Ontology Viewer</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/ontology-viewer.css">
+    <!-- N3.js from CDN -->
+    <script src="https://unpkg.com/n3@1.17.0/browser/n3.min.js"></script>
+    <!-- Cytoscape.js from CDN -->
+    <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🚇 터널 온톨로지 뷰어</h1>
+                <p class="subtitle">NATM Tunnel Excavation Process Ontology</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link active">온톨로지 뷰어</a>
+                <a href="process.html" class="nav-link">프로세스 타임라인</a>
+            </nav>
+        </header>
+
+        <!-- 로딩 인디케이터 -->
+        <div id="loading" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>온톨로지 로딩 중...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="error-message" class="error-container" style="display: none;"></div>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="main-container">
+            <!-- 좌측 사이드바: 클래스 계층 구조 -->
+            <aside class="sidebar" id="hierarchy-panel">
+                <div class="panel-header">
+                    <h2>📊 클래스 계층</h2>
+                </div>
+                <div class="panel-content" id="hierarchy-content">
+                    <p class="placeholder">로딩 중...</p>
+                </div>
+            </aside>
+
+            <!-- 메인 그래프 영역 -->
+            <main class="main-content">
+                <div class="panel-header">
+                    <h2>🕸️ 온톨로지 그래프</h2>
+                    <div class="graph-controls">
+                        <button id="btn-fit" class="btn btn-small">화면 맞춤</button>
+                        <button id="btn-reset" class="btn btn-small">초기화</button>
+                    </div>
+                </div>
+                <div id="graph-panel" class="graph-container"></div>
+
+                <!-- 범례 -->
+                <div class="legend">
+                    <h3>범례</h3>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-icon class-icon"></span>
+                            <span>클래스 (Class)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon object-prop-icon"></span>
+                            <span>객체 속성 (Object Property)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon datatype-prop-icon"></span>
+                            <span>데이터 속성 (Datatype Property)</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 우측 패널: 노드 세부 정보 -->
+            <aside class="sidebar sidebar-right" id="node-details-panel">
+                <div class="panel-header">
+                    <h2>ℹ️ 세부 정보</h2>
+                </div>
+                <div class="panel-content" id="node-details">
+                    <p class="placeholder">노드를 클릭하여 세부 정보를 확인하세요.</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Tunnel Ontology Project | OWL 2 Web Ontology Language</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript 모듈 로드 -->
+    <script type="module">
+        import { parseTurtleFile } from './src/parsers/turtle-parser.js';
+        import { renderOntologyGraph } from './src/visualizers/ontology-graph.js';
+        import { toggleLoading, showError } from './src/utils/formatters.js';
+
+        let cy = null; // Cytoscape 인스턴스
+
+        /**
+         * 애플리케이션 초기화
+         */
+        async function initApp() {
+            try {
+                toggleLoading(true);
+
+                // 1. 온톨로지 스키마 로드
+                console.log('Loading ontology schema...');
+                const { store, prefixes } = await parseTurtleFile('src/ontology/tunneling_schema.ttl');
+
+                // 2. 클래스 계층 렌더링
+                console.log('Rendering class hierarchy...');
+                renderClassHierarchy(store);
+
+                // 3. 온톨로지 그래프 렌더링
+                console.log('Rendering ontology graph...');
+                cy = renderOntologyGraph(store, 'graph-panel');
+
+                // 4. 컨트롤 버튼 이벤트 설정
+                setupControls();
+
+                toggleLoading(false);
+                console.log('✓ Application initialized successfully!');
+
+            } catch (error) {
+                toggleLoading(false);
+                console.error('✗ Failed to initialize application:', error);
+                showError(`온톨로지 로드 실패: ${error.message}`);
+            }
+        }
+
+        /**
+         * 클래스 계층 구조 렌더링 (간단한 리스트 형태)
+         */
+        function renderClassHierarchy(store) {
+            const hierarchyContent = document.getElementById('hierarchy-content');
+            const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+            const OWL_CLASS = 'http://www.w3.org/2002/07/owl#Class';
+            const RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
+
+            // 모든 클래스 가져오기
+            const classQuads = store.getQuads(null, RDF_TYPE, OWL_CLASS);
+            const classes = [];
+
+            for (const quad of classQuads) {
+                const uri = quad.subject.value;
+                const labelQuads = store.getQuads(uri, RDFS_LABEL, null);
+
+                let label = uri.split('#').pop() || uri.split('/').pop();
+                // 한글 레이블 우선
+                for (const lq of labelQuads) {
+                    if (lq.object.language === 'ko') {
+                        label = lq.object.value;
+                        break;
+                    }
+                }
+
+                classes.push({ uri, label });
+            }
+
+            // HTML 생성
+            let html = '<ul class="class-list">';
+            classes.sort((a, b) => a.label.localeCompare(b.label));
+
+            for (const cls of classes) {
+                html += `<li class="class-item" data-uri="${cls.uri}">
+                    <span class="class-icon-small"></span>
+                    ${cls.label}
+                </li>`;
+            }
+            html += '</ul>';
+
+            hierarchyContent.innerHTML = html;
+
+            // 클릭 이벤트: 그래프에서 해당 노드 강조
+            document.querySelectorAll('.class-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const uri = item.dataset.uri;
+                    if (cy) {
+                        cy.nodes().unselect();
+                        const node = cy.getElementById(uri);
+                        if (node) {
+                            node.select();
+                            cy.center(node);
+                        }
+                    }
+                });
+            });
+        }
+
+        /**
+         * 그래프 컨트롤 버튼 설정
+         */
+        function setupControls() {
+            // 화면 맞춤 버튼
+            document.getElementById('btn-fit')?.addEventListener('click', () => {
+                if (cy) {
+                    cy.fit();
+                }
+            });
+
+            // 초기화 버튼
+            document.getElementById('btn-reset')?.addEventListener('click', () => {
+                if (cy) {
+                    cy.reset();
+                    cy.fit();
+                }
+            });
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

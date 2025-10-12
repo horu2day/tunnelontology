@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>터널 온톨로지 뷰어 | Tunnel Ontology Viewer</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/ontology-viewer.css">
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/ontology-viewer.css">
     <!-- N3.js from CDN -->
     <script src="https://unpkg.com/n3@1.17.0/browser/n3.min.js"></script>
     <!-- Cytoscape.js from CDN -->
@@ -20,9 +20,9 @@
                 <p class="subtitle">NATM Tunnel Excavation Process Ontology</p>
             </div>
             <nav class="header-nav">
-                <a href="index.html" class="nav-link active">온톨로지 뷰어</a>
-                <a href="process.html" class="nav-link">프로세스 타임라인</a>
-                <a href="usecases.html" class="nav-link">활용 사례</a>
+                <a href="./index.html" class="nav-link active">온톨로지 뷰어</a>
+                <a href="./process.html" class="nav-link">프로세스 타임라인</a>
+                <a href="./usecases.html" class="nav-link">활용 사례</a>
             </nav>
         </header>
 
@@ -114,7 +114,7 @@
 
                 // 1. 온톨로지 스키마 로드
                 console.log('Loading ontology schema...');
-                const { store, prefixes } = await parseTurtleFile('src/ontology/tunneling_schema.ttl');
+                const { store, prefixes } = await parseTurtleFile('./src/ontology/tunneling_schema.ttl');
 
                 // 2. 클래스 계층 렌더링
                 console.log('Rendering class hierarchy...');

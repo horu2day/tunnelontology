@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>온톨로지 활용 사례 | Ontology Use Cases</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/usecases.css">
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/usecases.css">
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- N3.js from CDN -->
@@ -20,9 +20,9 @@
                 <p class="subtitle">Ontology Data Use Cases & Analytics</p>
             </div>
             <nav class="header-nav">
-                <a href="index.html" class="nav-link">온톨로지 뷰어</a>
-                <a href="process.html" class="nav-link">프로세스 타임라인</a>
-                <a href="usecases.html" class="nav-link active">활용 사례</a>
+                <a href="./index.html" class="nav-link">온톨로지 뷰어</a>
+                <a href="./process.html" class="nav-link">프로세스 타임라인</a>
+                <a href="./usecases.html" class="nav-link active">활용 사례</a>
             </nav>
         </header>
 
@@ -241,8 +241,8 @@
                 toggleLoading(true);
 
                 const result = await parseMultipleTurtleFiles([
-                    'src/ontology/tunneling_schema.ttl',
-                    'src/ontology/tunnel_instances.ttl'
+                    './src/ontology/tunneling_schema.ttl',
+                    './src/ontology/tunnel_instances.ttl'
                 ]);
 
                 store = result.store;
@@ -300,6 +300,6 @@
         // 차트 렌더링 함수들은 다음 스크립트 블록에서 계속...
     </script>
 
-    <script type="module" src="src/visualizers/usecase-charts.js"></script>
+    <script type="module" src="./src/visualizers/usecase-charts.js"></script>
 </body>
 </html>

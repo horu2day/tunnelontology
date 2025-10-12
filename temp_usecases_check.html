@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>온톨로지 활용 사례 | Ontology Use Cases</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/usecases.css">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- N3.js from CDN -->
+    <script src="https://unpkg.com/n3@1.17.0/browser/n3.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📊 온톨로지 데이터 활용 사례</h1>
+                <p class="subtitle">Ontology Data Use Cases & Analytics</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">온톨로지 뷰어</a>
+                <a href="process.html" class="nav-link">프로세스 타임라인</a>
+                <a href="usecases.html" class="nav-link active">활용 사례</a>
+            </nav>
+        </header>
+
+        <!-- 로딩 인디케이터 -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>데이터 분석 중...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-box">
+                <h3>⚠️ 오류 발생</h3>
+                <p id="error-message"></p>
+            </div>
+        </div>
+
+        <!-- 메인 컨테이너 -->
+        <div class="usecases-container">
+            <!-- 개요 섹션 -->
+            <section class="intro-section">
+                <h2>🎯 온톨로지 데이터 활용 방법</h2>
+                <p>NATM 터널 굴착 온톨로지 데이터를 활용하여 다양한 분석과 의사결정을 지원할 수 있습니다.</p>
+
+                <div class="use-case-categories">
+                    <div class="category-card">
+                        <div class="category-icon">⏱️</div>
+                        <h3>시간 분석</h3>
+                        <p>사이클별/단계별 소요 시간 분석</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🔧</div>
+                        <h3>장비 관리</h3>
+                        <p>장비 사용 빈도 및 효율성 분석</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">📏</div>
+                        <h3>진척도 측정</h3>
+                        <p>전진장 및 효율성 지표 계산</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🏗️</div>
+                        <h3>자원 분석</h3>
+                        <p>지보재, 천공구멍 등 자원 사용 통계</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Use Case 1: 사이클별 소요 시간 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>⏱️ Use Case 1: 사이클별 소요 시간 분석</h2>
+                    <p>각 굴착 사이클의 총 소요 시간과 단계별 시간 분포를 분석합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-cycle-durations"></canvas>
+                    </div>
+                    <div class="data-table-container">
+                        <table id="table-cycle-durations" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>사이클</th>
+                                    <th>총 소요시간</th>
+                                    <th>가장 긴 단계</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Use Case 2: 단계별 평균 소요 시간 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>📊 Use Case 2: 단계별 평균 소요 시간</h2>
+                    <p>6단계별 평균 작업 시간을 비교하여 병목 구간을 파악합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-stage-averages"></canvas>
+                    </div>
+                    <div class="insights-box">
+                        <h3>💡 인사이트</h3>
+                        <ul id="insights-stage-averages"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Use Case 3: 장비 사용 빈도 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>🔧 Use Case 3: 장비 사용 빈도 분석</h2>
+                    <p>어떤 장비가 얼마나 자주 사용되는지 분석하여 장비 관리 계획을 수립합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-equipment-usage"></canvas>
+                    </div>
+                    <div class="equipment-list" id="equipment-list"></div>
+                </div>
+            </section>
+
+            <!-- Use Case 4: 전진장 비교 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>📏 Use Case 4: 전진장 분석</h2>
+                    <p>각 사이클의 전진장을 비교하고 통계를 계산합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-avg-advance">-</div>
+                            <div class="stat-label">평균 전진장</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-max-advance">-</div>
+                            <div class="stat-label">최대 전진장</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-min-advance">-</div>
+                            <div class="stat-label">최소 전진장</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-total-advance">-</div>
+                            <div class="stat-label">총 전진장</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-advance-length"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Use Case 5: 효율성 지표 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>⚡ Use Case 5: 효율성 지표 (m/h)</h2>
+                    <p>사이클당 시간 대비 전진장 비율로 굴착 효율성을 측정합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-efficiency"></canvas>
+                    </div>
+                    <div class="data-table-container">
+                        <table id="table-efficiency" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>사이클</th>
+                                    <th>전진장 (m)</th>
+                                    <th>소요시간 (h)</th>
+                                    <th>효율성 (m/h)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Use Case 6: 지보재 설치 통계 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>🏗️ Use Case 6: 지보재 설치 통계</h2>
+                    <p>각 사이클에서 설치된 지보재의 종류와 수량을 분석합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-support-members"></canvas>
+                    </div>
+                    <div id="support-details" class="detail-list"></div>
+                </div>
+            </section>
+
+            <!-- Use Case 7: 천공 구멍 분석 -->
+            <section class="use-case-section">
+                <div class="section-header">
+                    <h2>🔨 Use Case 7: 천공 구멍 분석</h2>
+                    <p>사이클별 천공 구멍의 종류(심빼기공, 주변공, 보조공)와 수량을 분석합니다.</p>
+                </div>
+                <div class="use-case-content">
+                    <div class="chart-container">
+                        <canvas id="chart-drill-holes"></canvas>
+                    </div>
+                    <div id="drillhole-details" class="detail-list"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Tunnel Ontology Project | Data-Driven Decision Making</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { parseMultipleTurtleFiles } from './src/parsers/turtle-parser.js';
+        import { toggleLoading, showError } from './src/utils/formatters.js';
+        import {
+            analyzeCycleDurations,
+            analyzeEquipmentUsage,
+            analyzeSupportInstallation,
+            analyzeAdvanceLength,
+            analyzeStageAverageDurations,
+            analyzeDrillHoles,
+            calculateEfficiencyMetrics
+        } from './src/utils/query-utils.js';
+
+        let store = null;
+
+        // 앱 초기화
+        document.addEventListener('DOMContentLoaded', async function initApp() {
+            try {
+                console.log('Loading ontology data...');
+                toggleLoading(true);
+
+                const result = await parseMultipleTurtleFiles([
+                    'src/ontology/tunneling_schema.ttl',
+                    'src/ontology/tunnel_instances.ttl'
+                ]);
+
+                store = result.store;
+                console.log('✓ Data loaded successfully');
+
+                // 모든 분석 실행
+                await runAllAnalyses();
+
+                toggleLoading(false);
+                console.log('✓ All analyses completed');
+            } catch (error) {
+                console.error('✗ Failed to initialize:', error);
+                showError(`데이터 로드 실패: ${error.message}`);
+                toggleLoading(false);
+            }
+        });
+
+        async function runAllAnalyses() {
+            // Use Case 1: 사이클별 소요 시간
+            const cycleDurations = analyzeCycleDurations(store);
+            renderCycleDurationsChart(cycleDurations);
+            renderCycleDurationsTable(cycleDurations);
+
+            // Use Case 2: 단계별 평균 소요 시간
+            const stageAverages = analyzeStageAverageDurations(store);
+            renderStageAveragesChart(stageAverages);
+            renderStageInsights(stageAverages);
+
+            // Use Case 3: 장비 사용 빈도
+            const equipmentUsage = analyzeEquipmentUsage(store);
+            renderEquipmentUsageChart(equipmentUsage);
+            renderEquipmentList(equipmentUsage);
+
+            // Use Case 4: 전진장 분석
+            const advanceLength = analyzeAdvanceLength(store);
+            renderAdvanceLengthStats(advanceLength.statistics);
+            renderAdvanceLengthChart(advanceLength.cycles);
+
+            // Use Case 5: 효율성 지표
+            const efficiency = calculateEfficiencyMetrics(store);
+            renderEfficiencyChart(efficiency);
+            renderEfficiencyTable(efficiency);
+
+            // Use Case 6: 지보재 설치
+            const supportInstallation = analyzeSupportInstallation(store);
+            renderSupportMembersChart(supportInstallation);
+            renderSupportDetails(supportInstallation);
+
+            // Use Case 7: 천공 구멍
+            const drillHoles = analyzeDrillHoles(store);
+            renderDrillHolesChart(drillHoles);
+            renderDrillHoleDetails(drillHoles);
+        }
+
+        // 차트 렌더링 함수들은 다음 스크립트 블록에서 계속...
+    </script>
+
+    <script type="module" src="src/visualizers/usecase-charts.js"></script>
+</body>
+</html>

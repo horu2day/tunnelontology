@@ -62,6 +62,17 @@ export function renderOntologyGraph(store, containerId) {
     elements: elements,
     style: getCytoscapeStyle(),
     layout: {
+      name: 'preset'  // 초기에는 preset(수동 배치) 모드
+    },
+    // Zoom 감도 설정 (매우 부드러운 줌을 위해 0.05로 설정)
+    wheelSensitivity: 0.05  // 기본값 0.2의 1/4로 더욱 부드럽게
+  });
+
+  // 6. 저장된 레이아웃 복원 시도, 없으면 자동 레이아웃 실행
+  const hasLoadedLayout = loadLayoutPositions(cy);
+  if (!hasLoadedLayout) {
+    // 저장된 레이아웃이 없으면 COSE 알고리즘으로 자동 배치
+    cy.layout({
       name: 'cose',
       idealEdgeLength: 100,
       nodeOverlap: 20,
@@ -78,10 +89,10 @@ export function renderOntologyGraph(store, containerId) {
       initialTemp: 200,
       coolingFactor: 0.95,
       minTemp: 1.0
-    }
-  });
+    }).run();
+  }
 
-  // 6. 이벤트 핸들러 등록
+  // 7. 이벤트 핸들러 등록
   setupEventHandlers(cy);
 
   console.log('✓ Ontology graph rendered successfully');
@@ -377,6 +388,25 @@ function setupEventHandlers(cy) {
       node.style('border-width', '2px');
     }
   });
+
+  // 레이아웃 저장 버튼 이벤트
+  const saveLayoutBtn = document.getElementById('save-layout-btn');
+  if (saveLayoutBtn) {
+    saveLayoutBtn.addEventListener('click', () => {
+      saveLayoutPositions(cy);
+      alert('레이아웃이 저장되었습니다!');
+    });
+  }
+
+  // 레이아웃 초기화 버튼 이벤트
+  const resetLayoutBtn = document.getElementById('reset-layout-btn');
+  if (resetLayoutBtn) {
+    resetLayoutBtn.addEventListener('click', () => {
+      clearLayoutPositions();
+      cy.layout({ name: 'cose' }).run();
+      alert('레이아웃이 초기화되었습니다!');
+    });
+  }
 }
 
 /**
@@ -398,6 +428,76 @@ function displayNodeDetails(data) {
 
   detailsPanel.innerHTML = html;
   detailsPanel.style.display = 'block';
+}
+
+/**
+ * 현재 노드 위치를 localStorage에 저장
+ * @param {Object} cy - Cytoscape 인스턴스
+ */
+function saveLayoutPositions(cy) {
+  const positions = {};
+  cy.nodes().forEach(node => {
+    const pos = node.position();
+    positions[node.id()] = {
+      x: pos.x,
+      y: pos.y
+    };
+  });
+
+  try {
+    localStorage.setItem('ontology-graph-layout', JSON.stringify(positions));
+    console.log('✓ Layout positions saved to localStorage');
+  } catch (error) {
+    console.error('Failed to save layout positions:', error);
+  }
+}
+
+/**
+ * localStorage에서 노드 위치를 복원
+ * @param {Object} cy - Cytoscape 인스턴스
+ * @returns {boolean} 레이아웃 복원 성공 여부
+ */
+function loadLayoutPositions(cy) {
+  try {
+    const savedPositions = localStorage.getItem('ontology-graph-layout');
+    if (!savedPositions) {
+      console.log('No saved layout found');
+      return false;
+    }
+
+    const positions = JSON.parse(savedPositions);
+    let restoredCount = 0;
+
+    cy.nodes().forEach(node => {
+      const nodeId = node.id();
+      if (positions[nodeId]) {
+        node.position(positions[nodeId]);
+        restoredCount++;
+      }
+    });
+
+    if (restoredCount > 0) {
+      console.log(`✓ Restored ${restoredCount} node positions from localStorage`);
+      // 저장된 위치 그대로 유지 (fit 호출 안 함)
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Failed to load layout positions:', error);
+    return false;
+  }
+}
+
+/**
+ * 저장된 레이아웃 위치 삭제
+ */
+function clearLayoutPositions() {
+  try {
+    localStorage.removeItem('ontology-graph-layout');
+    console.log('✓ Saved layout positions cleared');
+  } catch (error) {
+    console.error('Failed to clear layout positions:', error);
+  }
 }
 
 export default { renderOntologyGraph };

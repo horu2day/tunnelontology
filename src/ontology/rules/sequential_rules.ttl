@@ -1,0 +1,178 @@
+@prefix : <http://example.org/tunnel-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 순차 관계 추론 규칙 (Sequential Inference Rules)
+# ============================================
+
+# 이 파일은 SPARQL CONSTRUCT 쿼리로 실행되는 추론 규칙을 정의합니다.
+# JavaScript 추론 엔진에서 읽어서 실행합니다.
+
+# ============================================
+# Rule 1: 역방향 순차 관계 추론
+# ============================================
+# 설명: hasPreviousStep이 있으면 자동으로 hasNextStep 관계 생성
+# 입력: ?current :hasPreviousStep ?previous
+# 출력: ?previous :hasNextStep ?current
+
+:SequentialRule_InverseNext a :InferenceRule ;
+    rdfs:label "역방향 순차 관계 추론"@ko ;
+    rdfs:comment "이전 단계(previous)가 정의되면 자동으로 다음 단계(next) 관계를 추론합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?previous :hasNextStep ?current .
+        }
+        WHERE {
+            ?current :hasPreviousStep ?previous .
+            FILTER NOT EXISTS {
+                ?previous :hasNextStep ?current .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 2: 전이적 계층 소속 추론
+# ============================================
+# 설명: 하위 활동이 어떤 최상위 프로세스에 속하는지 추론
+# 입력: ?child :hasParent+ ?mainProcess
+# 출력: ?child :belongsToProcess ?mainProcess
+
+:SequentialRule_BelongsTo a :InferenceRule ;
+    rdfs:label "계층 소속 추론"@ko ;
+    rdfs:comment "하위 활동이 어떤 메인 프로세스에 속하는지 자동으로 추론합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?child :belongsToProcess ?mainProcess .
+        }
+        WHERE {
+            ?child :hasParent+ ?mainProcess .
+            ?mainProcess a :MainProcess .
+            FILTER NOT EXISTS {
+                ?child :belongsToProcess ?mainProcess .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 3: 프로세스 완료 순서 검증
+# ============================================
+# 설명: 순차적 단계가 올바른 순서로 배열되어 있는지 확인
+# sequenceOrder 속성을 사용하여 검증
+
+:SequentialRule_OrderValidation a :InferenceRule ;
+    rdfs:label "순서 검증"@ko ;
+    rdfs:comment "순차적 단계의 sequenceOrder가 올바른지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?current :hasPrerequisiteViolation [
+                a :SequenceViolation ;
+                :violationType "InvalidSequenceOrder" ;
+                :violationMessage "순서 번호가 일치하지 않습니다" ;
+                :expectedOrder ?prevOrder ;
+                :actualOrder ?currOrder
+            ] .
+        }
+        WHERE {
+            ?current :hasPreviousStep ?previous ;
+                     :sequenceOrder ?currOrder .
+            ?previous :sequenceOrder ?prevOrder .
+            FILTER (?currOrder <= ?prevOrder)
+        }
+    """ .
+
+# ============================================
+# Rule 4: 프로세스 체인 완전성 검증
+# ============================================
+# 설명: 시작과 끝이 명확한 프로세스 체인 확인
+
+:SequentialRule_ChainCompleteness a :InferenceRule ;
+    rdfs:label "프로세스 체인 완전성 검증"@ko ;
+    rdfs:comment "시작 노드와 종료 노드가 명확한지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?activity :hasStartNode true .
+        }
+        WHERE {
+            ?activity a :ProcessActivity .
+            FILTER NOT EXISTS {
+                ?activity :hasPreviousStep ?any .
+            }
+        }
+    """ .
+
+:SequentialRule_EndNode a :InferenceRule ;
+    rdfs:label "종료 노드 식별"@ko ;
+    rdfs:comment "다음 단계가 없는 종료 노드를 식별합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?activity :hasEndNode true .
+        }
+        WHERE {
+            ?activity a :ProcessActivity .
+            FILTER NOT EXISTS {
+                ?activity :hasNextStep ?any .
+            }
+            FILTER NOT EXISTS {
+                ?next :hasPreviousStep ?activity .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 5: 순환 참조 탐지
+# ============================================
+# 설명: 프로세스 체인에 순환 참조가 있는지 탐지
+
+:SequentialRule_CircularDetection a :InferenceRule ;
+    rdfs:label "순환 참조 탐지"@ko ;
+    rdfs:comment "프로세스 순서에 순환 참조가 있는지 탐지합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?activity :hasPrerequisiteViolation [
+                a :SequenceViolation ;
+                :violationType "CircularReference" ;
+                :violationMessage "프로세스 순서에 순환 참조가 있습니다"
+            ] .
+        }
+        WHERE {
+            ?activity :hasPreviousStep+ ?activity .
+        }
+    """ .
+
+# ============================================
+# 추론 규칙 메타데이터
+# ============================================
+
+:InferenceRule a owl:Class ;
+    rdfs:label "추론 규칙"@ko ;
+    rdfs:comment "SPARQL CONSTRUCT 쿼리로 표현된 추론 규칙"@ko .
+
+:sparqlConstruct a owl:DatatypeProperty ;
+    rdfs:label "SPARQL CONSTRUCT 쿼리"@ko ;
+    rdfs:domain :InferenceRule ;
+    rdfs:range xsd:string .
+
+:expectedOrder a owl:DatatypeProperty ;
+    rdfs:label "예상 순서"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:integer .
+
+:actualOrder a owl:DatatypeProperty ;
+    rdfs:label "실제 순서"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:integer .

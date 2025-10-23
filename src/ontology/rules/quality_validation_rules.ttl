@@ -1,0 +1,198 @@
+@prefix : <http://example.org/tunnel-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 품질 검증 추론 규칙 (Quality Validation Rules)
+# ============================================
+
+# ============================================
+# Rule 1: 숏크리트 시공 후 품질 검사 필수
+# ============================================
+# 설명: 숏크리트 시공 이후 반드시 완료 검사가 있어야 함
+
+:QualityRule_InspectionRequired a :InferenceRule ;
+    rdfs:label "숏크리트 품질검사 필수"@ko ;
+    rdfs:comment "숏크리트 시공 후 완료 검사가 누락되었는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?shotcrete :hasQualityViolation [
+                a :QualityViolation ;
+                :violationType "MissingInspection" ;
+                :violationMessage "숏크리트 시공 후 품질 검사가 누락되었습니다"@ko ;
+                :missingActivity "CompletionInspection"
+            ] .
+        }
+        WHERE {
+            ?shotcrete a :ShotcreteConstruction .
+            FILTER NOT EXISTS {
+                ?shotcrete :hasNextStep* ?inspection .
+                ?inspection a :CompletionInspection .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 2: 품질검사 세부 항목 완전성
+# ============================================
+# 설명: 완료 검사가 필수 하위 단계를 모두 포함하는지 확인
+
+:QualityRule_InspectionCompleteness a :InferenceRule ;
+    rdfs:label "품질검사 완전성"@ko ;
+    rdfs:comment "완료 검사의 필수 세부 항목이 모두 있는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?inspection :hasQualityViolation [
+                a :QualityViolation ;
+                :violationType "IncompleteInspection" ;
+                :violationMessage "품질 검사 세부 항목이 불완전합니다"@ko ;
+                :requiredSteps 6
+            ] .
+        }
+        WHERE {
+            ?inspection a :CompletionInspection ;
+                        :activityName "h-4-6.숏크리트 시공상태 확인" .
+            {
+                SELECT ?inspection (COUNT(?step) AS ?stepCount)
+                WHERE {
+                    ?step :hasParent ?inspection .
+                }
+                GROUP BY ?inspection
+                HAVING (?stepCount < 6)
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 3: 강도 검사 결과 추론
+# ============================================
+# 설명: 강도 검사 단계가 수행되었는지 확인
+
+:QualityRule_StrengthTest a :InferenceRule ;
+    rdfs:label "강도 검사 수행 확인"@ko ;
+    rdfs:comment "일반 강도 및 강섬유 강도 검사가 모두 수행되었는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?inspection :hasQualityCheck :StrengthTestCompleted .
+        }
+        WHERE {
+            ?inspection a :CompletionInspection .
+            ?generalStrength :hasParent ?inspection ;
+                            :activityName "h-4-6-1.강도 확인(일반)" .
+            ?fiberStrength :hasParent ?inspection ;
+                          :activityName "h-4-6-2.강도 확인(강섬유)" .
+        }
+    """ .
+
+# ============================================
+# Rule 4: 두께 및 마무리 검사 완료
+# ============================================
+# 설명: 숏크리트 두께와 마무리면 검사가 수행되었는지 확인
+
+:QualityRule_ThicknessFinish a :InferenceRule ;
+    rdfs:label "두께 및 마무리 검사 완료"@ko ;
+    rdfs:comment "숏크리트 두께 및 마무리면 검사가 수행되었는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?inspection :hasQualityCheck :ThicknessFinishCompleted .
+        }
+        WHERE {
+            ?inspection a :CompletionInspection .
+            ?thickness :hasParent ?inspection ;
+                       :activityName "h-4-6-6.숏크리트 두께 확인" .
+            ?finish :hasParent ?inspection ;
+                    :activityName "h-4-6-5.숏크리트 마무리면 확인" .
+        }
+    """ .
+
+# ============================================
+# Rule 5: 자재 검사 항목 완전성
+# ============================================
+# 설명: 자재 검사가 모든 필수 자재를 포함하는지 확인
+
+:QualityRule_MaterialInspectionCompleteness a :InferenceRule ;
+    rdfs:label "자재 검사 완전성"@ko ;
+    rdfs:comment "자재 검사에 필수 자재(골재, 강섬유, 급결제, 혼화제)가 모두 포함되었는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?materialInsp :hasQualityCheck :AllMaterialsInspected .
+        }
+        WHERE {
+            ?materialInsp a :MaterialInspection .
+            ?aggregate :hasParent ?materialInsp ;
+                      :activityName "h-4-3-1.숏크리트용 골재 품질기준 확인" .
+            ?fiber :hasParent ?materialInsp ;
+                  :activityName "h-4-3-2.강섬유 품질기준" .
+            ?accelerator :hasParent ?materialInsp ;
+                        :activityName "h-4-3-3.급결제 품질기준" .
+            ?admixture :hasParent ?materialInsp ;
+                      :activityName "h-4-3-4.혼화제 품질기준" .
+        }
+    """ .
+
+# ============================================
+# Rule 6: 품질 위반 심각도 분류
+# ============================================
+# 설명: 품질 위반의 심각도를 자동으로 분류
+
+:QualityRule_SeverityClassification a :InferenceRule ;
+    rdfs:label "위반 심각도 분류"@ko ;
+    rdfs:comment "품질 위반 사항의 심각도를 High, Medium, Low로 분류합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?violation :hasSeverity "High" .
+        }
+        WHERE {
+            ?violation a :QualityViolation ;
+                      :violationType ?type .
+            FILTER (?type IN ("MissingInspection", "MaterialNotInspected"))
+        }
+    """ .
+
+# ============================================
+# 새로운 속성 정의
+# ============================================
+
+:hasQualityCheck a owl:ObjectProperty ;
+    rdfs:label "품질 검사 보유"@ko ;
+    rdfs:comment "완료된 품질 검사 항목"@ko ;
+    rdfs:domain :QualityControl .
+
+:missingActivity a owl:DatatypeProperty ;
+    rdfs:label "누락된 활동"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:string .
+
+:requiredSteps a owl:DatatypeProperty ;
+    rdfs:label "필수 단계 수"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:integer .
+
+:hasSeverity a owl:DatatypeProperty ;
+    rdfs:label "심각도"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:string .
+
+# 품질 검사 완료 상태 개체
+:StrengthTestCompleted a owl:NamedIndividual ;
+    rdfs:label "강도 검사 완료"@ko .
+
+:ThicknessFinishCompleted a owl:NamedIndividual ;
+    rdfs:label "두께 및 마무리 검사 완료"@ko .
+
+:AllMaterialsInspected a owl:NamedIndividual ;
+    rdfs:label "모든 자재 검사 완료"@ko .

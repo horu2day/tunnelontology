@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>터널 온톨로지 추론 엔진</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/inference.css">
+    <!-- rdflib.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/rdflib@2.2.34/dist/rdflib.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🧠 터널 온톨로지 추론 엔진</h1>
+                <p class="subtitle">RuleSet-based Inference System</p>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">온톨로지 뷰어</a>
+                <a href="process.html" class="nav-link">프로세스 타임라인</a>
+                <a href="inference.html" class="nav-link active">추론 엔진</a>
+                <a href="usecases.html" class="nav-link">활용 사례</a>
+            </nav>
+        </header>
+
+        <div id="inference-container" class="container">
+            <!-- 추론 뷰어가 여기에 렌더링됩니다 -->
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="app-footer">
+            <p>&copy; 2025 Tunnel Ontology Project | RuleSet 기반 추론</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initInferenceViewer } from './src/visualizers/inference_viewer.js';
+
+        // 페이지 로드 시 추론 뷰어 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            initInferenceViewer('inference-container');
+        });
+    </script>
+</body>
+</html>

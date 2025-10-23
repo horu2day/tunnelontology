@@ -1,0 +1,497 @@
+/**
+ * 추론 엔진 페이지 전용 스타일
+ */
+
+body {
+    overflow-y: scroll;
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex: 1;
+    width: 100%;
+}
+
+.app-footer {
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.inference-viewer {
+    padding: 2rem 0;
+}
+
+.inference-viewer h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.inference-viewer .description {
+    color: #7f8c8d;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* 제어 패널 */
+.inference-controls {
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.inference-controls h2 {
+    margin-top: 0;
+    color: #34495e;
+    font-size: 1.3rem;
+}
+
+.inference-controls button {
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+/* 상태 표시 영역 */
+.inference-status {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.inference-status::-webkit-scrollbar {
+    width: 8px;
+}
+
+.inference-status::-webkit-scrollbar-track {
+    background: #ecf0f1;
+    border-radius: 4px;
+}
+
+.inference-status::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+.inference-status::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+.inference-status p {
+    margin: 0.5rem 0;
+    color: #2c3e50;
+}
+
+.inference-status .loading {
+    color: #3498db;
+    font-weight: bold;
+}
+
+.inference-status .error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* 결과 영역 */
+.inference-results {
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.inference-results::-webkit-scrollbar {
+    width: 10px;
+}
+
+.inference-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.inference-results::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.inference-results::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.inference-results h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    padding-top: 0.5rem;
+}
+
+.inference-results h3 {
+    color: #34495e;
+    margin-top: 1.5rem;
+    position: sticky;
+    top: 3rem;
+    background-color: white;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    z-index: 9;
+}
+
+/* 추론 과정 설명 */
+.inference-explanation {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.inference-explanation h3 {
+    margin-top: 0;
+    color: white;
+}
+
+.explanation-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.inference-steps {
+    display: grid;
+    gap: 1rem;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.step:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.step-number {
+    background-color: white;
+    color: #667eea;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-right: 1rem;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 1.05rem;
+}
+
+/* SPARQL 쿼리 예시 */
+.sparql-examples {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sparql-examples h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.query-example {
+    background-color: white;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.query-example:last-child {
+    margin-bottom: 0;
+}
+
+.query-example h4 {
+    margin-top: 0;
+    color: #34495e;
+}
+
+.query-desc {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.query-example pre {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.query-example code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.query-result {
+    background-color: #d5f4e6;
+    border-left: 4px solid #27ae60;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.query-result code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* 추론 통계 */
+.reasoning-statistics {
+    background-color: #e8f4f8;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.reasoning-statistics h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.reasoning-statistics p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.reasoning-statistics strong {
+    color: #3498db;
+    font-size: 1.3rem;
+}
+
+.inference-note {
+    background-color: #fff9e6;
+    border-left: 4px solid #f39c12;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* 규칙 결과 테이블 */
+.rule-results {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 1rem;
+    border: 1px solid #ecf0f1;
+    border-radius: 4px;
+}
+
+.rule-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rule-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.rule-results::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 4px;
+}
+
+.rule-results::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}
+
+.rule-results table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.rule-results th,
+.rule-results td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.rule-results th {
+    background-color: #34495e;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.rule-results tr:hover {
+    background-color: #f8f9fa;
+}
+
+.rule-results td:last-child {
+    text-align: center;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+/* 위반 사항 */
+.violations {
+    margin-top: 2rem;
+}
+
+.violations .success {
+    color: #27ae60;
+    font-weight: bold;
+    padding: 1rem;
+    background-color: #d5f4e6;
+    border-radius: 4px;
+    border-left: 4px solid #27ae60;
+}
+
+.violation-list {
+    list-style: none;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #ffe5e5;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.violation-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.violation-list::-webkit-scrollbar-track {
+    background: #fff5f5;
+    border-radius: 4px;
+}
+
+.violation-list::-webkit-scrollbar-thumb {
+    background: #e74c3c;
+    border-radius: 4px;
+}
+
+.violation-list::-webkit-scrollbar-thumb:hover {
+    background: #c0392b;
+}
+
+.violation-item {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background-color: #ffe5e5;
+    border-left: 4px solid #e74c3c;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.violation-type {
+    display: inline-block;
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 3px;
+    font-weight: bold;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+
+.violation-message {
+    flex: 1;
+    color: #c0392b;
+    font-size: 1rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .inference-controls button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .violation-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .violation-type {
+        margin-bottom: 0.5rem;
+    }
+
+    .rule-results table {
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,238 @@
+@prefix : <http://example.org/tunnel-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 선행 조건 검증 규칙 (Prerequisite Validation Rules)
+# ============================================
+
+# ============================================
+# Rule 1: 시공 전 자재 검사 완료 필수
+# ============================================
+# 설명: 숏크리트 시공 전에 자재 검사가 완료되어야 함
+
+:PrerequisiteRule_MaterialInspection a :InferenceRule ;
+    rdfs:label "시공 전 자재 검사 필수"@ko ;
+    rdfs:comment "숏크리트 시공 전에 자재 검사가 완료되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?construction :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "MaterialNotInspected" ;
+                :violationMessage "시공 전 자재 검사가 완료되지 않았습니다"@ko ;
+                :requiredPrerequisite "MaterialInspection"
+            ] .
+        }
+        WHERE {
+            ?construction a :ShotcreteConstruction .
+            FILTER NOT EXISTS {
+                ?construction :hasPreviousStep* ?inspection .
+                ?inspection a :MaterialInspection .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 2: 시공 전 사전 조치 완료 필수
+# ============================================
+# 설명: 숏크리트 시공 전에 사전 조치가 완료되어야 함
+
+:PrerequisiteRule_PreparationActivity a :InferenceRule ;
+    rdfs:label "시공 전 사전 조치 필수"@ko ;
+    rdfs:comment "숏크리트 시공 전에 사전 조치가 완료되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?construction :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "PreparationNotCompleted" ;
+                :violationMessage "시공 전 조치가 완료되지 않았습니다"@ko ;
+                :requiredPrerequisite "PreparationActivity"
+            ] .
+        }
+        WHERE {
+            ?construction a :ShotcreteConstruction .
+            FILTER NOT EXISTS {
+                ?construction :hasPreviousStep* ?preparation .
+                ?preparation a :PreparationActivity ;
+                            :activityName "h-4-4.시공 전 조치" .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 3: 자재 검사 전 배합 설계 완료 필수
+# ============================================
+# 설명: 자재 검사 전에 배합 설계 및 보고가 완료되어야 함
+
+:PrerequisiteRule_MixDesign a :InferenceRule ;
+    rdfs:label "자재 검사 전 배합 설계 필수"@ko ;
+    rdfs:comment "자재 검사 전에 배합 설계가 완료되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?inspection :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "MixDesignNotCompleted" ;
+                :violationMessage "자재 검사 전 배합 설계가 완료되지 않았습니다"@ko ;
+                :requiredPrerequisite "MixDesign"
+            ] .
+        }
+        WHERE {
+            ?inspection a :MaterialInspection .
+            FILTER NOT EXISTS {
+                ?inspection :hasPreviousStep* ?mixDesign .
+                ?mixDesign :activityName "h-4-2-2.숏크리트 배합 설계 및 보고" .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 4: 시공계획서 작성 최우선 확인
+# ============================================
+# 설명: 모든 사전 조치 전에 시공계획서가 작성되어야 함
+
+:PrerequisiteRule_ConstructionPlan a :InferenceRule ;
+    rdfs:label "시공계획서 최우선 작성"@ko ;
+    rdfs:comment "사전 조치 활동에 시공계획서 작성이 포함되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?preparation :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "MissingConstructionPlan" ;
+                :violationMessage "사전 조치에 시공계획서 작성이 누락되었습니다"@ko ;
+                :requiredPrerequisite "ConstructionPlan"
+            ] .
+        }
+        WHERE {
+            ?preparation a :PreparationActivity ;
+                        :activityName "h-4-2.사전조치(숏크리트)" .
+            FILTER NOT EXISTS {
+                ?plan :hasParent ?preparation ;
+                      :activityName "h-4-2-1.시공계획서 작성 및 제출" .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 5: 근로자 교육 완료 확인
+# ============================================
+# 설명: 시공 전에 근로자 교육이 완료되어야 함
+
+:PrerequisiteRule_WorkerTraining a :InferenceRule ;
+    rdfs:label "근로자 교육 완료 확인"@ko ;
+    rdfs:comment "시공 전에 근로자 교육이 완료되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?construction :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "TrainingNotCompleted" ;
+                :violationMessage "시공 전 근로자 교육이 완료되지 않았습니다"@ko ;
+                :requiredPrerequisite "WorkerTraining"
+            ] .
+        }
+        WHERE {
+            ?construction a :ShotcreteConstruction .
+            FILTER NOT EXISTS {
+                ?construction :hasPreviousStep* ?training .
+                ?training :activityName "h-4-2-5.근로자 교육" .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 6: 시험 시공 완료 확인
+# ============================================
+# 설명: 본 시공 전에 시험 시공이 완료되어야 함
+
+:PrerequisiteRule_TrialConstruction a :InferenceRule ;
+    rdfs:label "시험 시공 완료 확인"@ko ;
+    rdfs:comment "본 시공 전에 시험 시공이 완료되지 않으면 위반으로 표시합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?construction :hasPrerequisiteViolation [
+                a :PrerequisiteViolation ;
+                :violationType "TrialNotCompleted" ;
+                :violationMessage "본 시공 전 시험 시공이 완료되지 않았습니다"@ko ;
+                :requiredPrerequisite "TrialConstruction"
+            ] .
+        }
+        WHERE {
+            ?construction a :ShotcreteConstruction .
+            FILTER NOT EXISTS {
+                ?construction :hasPreviousStep* ?trial .
+                ?trial :activityName "h-4-4-3.강섬유숏크리트 시험 시공" .
+            }
+        }
+    """ .
+
+# ============================================
+# Rule 7: 선행 조건 체인 검증
+# ============================================
+# 설명: 필수 선행 조건들이 올바른 순서로 완료되었는지 검증
+
+:PrerequisiteRule_ChainValidation a :InferenceRule ;
+    rdfs:label "선행 조건 체인 검증"@ko ;
+    rdfs:comment "필수 선행 조건들이 올바른 순서로 완료되었는지 확인합니다"@ko ;
+    :sparqlConstruct """
+        PREFIX : <http://example.org/tunnel-ontology#>
+
+        CONSTRUCT {
+            ?construction :hasPrerequisiteCheck :AllPrerequisitesCompleted .
+        }
+        WHERE {
+            ?construction a :ShotcreteConstruction .
+
+            # 시공계획서 확인
+            ?construction :hasPreviousStep* ?plan .
+            ?plan :activityName "h-4-2-1.시공계획서 작성 및 제출" .
+
+            # 자재 검사 확인
+            ?construction :hasPreviousStep* ?materialInsp .
+            ?materialInsp a :MaterialInspection .
+
+            # 시공 전 조치 확인
+            ?construction :hasPreviousStep* ?preparation .
+            ?preparation :activityName "h-4-4.시공 전 조치" .
+
+            # 근로자 교육 확인
+            ?construction :hasPreviousStep* ?training .
+            ?training :activityName "h-4-2-5.근로자 교육" .
+
+            # 시험 시공 확인
+            ?construction :hasPreviousStep* ?trial .
+            ?trial :activityName "h-4-4-3.강섬유숏크리트 시험 시공" .
+        }
+    """ .
+
+# ============================================
+# 새로운 속성 정의
+# ============================================
+
+:requiredPrerequisite a owl:DatatypeProperty ;
+    rdfs:label "필수 선행 조건"@ko ;
+    rdfs:comment "위반 시 필요한 선행 조건의 이름"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:string .
+
+:hasPrerequisiteCheck a owl:ObjectProperty ;
+    rdfs:label "선행 조건 검증 보유"@ko ;
+    rdfs:comment "완료된 선행 조건 검증 항목"@ko ;
+    rdfs:domain :ProcessActivity .
+
+# 선행 조건 완료 상태 개체
+:AllPrerequisitesCompleted a owl:NamedIndividual ;
+    rdfs:label "모든 선행 조건 완료"@ko ;
+    rdfs:comment "필수 선행 조건이 모두 완료됨"@ko .

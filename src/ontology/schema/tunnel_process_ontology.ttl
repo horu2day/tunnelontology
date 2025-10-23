@@ -1,0 +1,295 @@
+@prefix : <http://example.org/tunnel-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 온톨로지 메타데이터
+# ============================================
+
+<http://example.org/tunnel-ontology> a owl:Ontology ;
+    rdfs:label "터널 시공 프로세스 온톨로지"@ko ;
+    rdfs:label "Tunnel Construction Process Ontology"@en ;
+    rdfs:comment "NATM 터널 시공 공정의 계층적 프로세스 구조를 표현하는 온톨로지"@ko ;
+    owl:versionInfo "1.0.0" .
+
+# ============================================
+# 클래스 정의 (Class Definitions)
+# ============================================
+
+## 프로세스 활동 계층 구조
+
+:ProcessActivity a owl:Class ;
+    rdfs:label "프로세스 활동"@ko ;
+    rdfs:label "Process Activity"@en ;
+    rdfs:comment "터널 시공 프로세스의 모든 활동을 나타내는 최상위 추상 클래스"@ko .
+
+:MainProcess a owl:Class ;
+    rdfs:subClassOf :ProcessActivity ;
+    rdfs:label "주 프로세스"@ko ;
+    rdfs:label "Main Process"@en ;
+    rdfs:comment "최상위 수준의 시공 프로세스 (예: Sealing, 굴착, 지보재 설치)"@ko .
+
+:SubProcess a owl:Class ;
+    rdfs:subClassOf :ProcessActivity ;
+    rdfs:label "하위 프로세스"@ko ;
+    rdfs:label "Sub Process"@en ;
+    rdfs:comment "주 프로세스 내의 세부 프로세스"@ko .
+
+:Task a owl:Class ;
+    rdfs:subClassOf :ProcessActivity ;
+    rdfs:label "작업"@ko ;
+    rdfs:label "Task"@en ;
+    rdfs:comment "프로세스를 구성하는 구체적 작업 단위"@ko .
+
+:Step a owl:Class ;
+    rdfs:subClassOf :ProcessActivity ;
+    rdfs:label "단계"@ko ;
+    rdfs:label "Step"@en ;
+    rdfs:comment "작업을 구성하는 최소 실행 단위"@ko .
+
+## 품질 관리
+
+:QualityControl a owl:Class ;
+    rdfs:label "품질 관리"@ko ;
+    rdfs:label "Quality Control"@en ;
+    rdfs:comment "시공 품질을 검증하는 활동"@ko .
+
+:MaterialInspection a owl:Class ;
+    rdfs:subClassOf :QualityControl ;
+    rdfs:label "자재 검사"@ko ;
+    rdfs:label "Material Inspection"@en ;
+    rdfs:comment "시공에 사용되는 자재의 품질 기준 확인"@ko .
+
+:CompletionInspection a owl:Class ;
+    rdfs:subClassOf :QualityControl ;
+    rdfs:label "완료 검사"@ko ;
+    rdfs:label "Completion Inspection"@en ;
+    rdfs:comment "시공 완료 후 품질 상태 확인"@ko .
+
+:PreparationActivity a owl:Class ;
+    rdfs:subClassOf :Task ;
+    rdfs:label "사전 조치"@ko ;
+    rdfs:label "Preparation Activity"@en ;
+    rdfs:comment "본격적인 시공 전 준비 작업"@ko .
+
+## 자재
+
+:Material a owl:Class ;
+    rdfs:label "자재"@ko ;
+    rdfs:label "Material"@en ;
+    rdfs:comment "시공에 사용되는 재료"@ko .
+
+:Shotcrete a owl:Class ;
+    rdfs:subClassOf :Material ;
+    rdfs:label "숏크리트"@ko ;
+    rdfs:label "Shotcrete"@en ;
+    rdfs:comment "분사 콘크리트"@ko .
+
+:SteelFiber a owl:Class ;
+    rdfs:subClassOf :Material ;
+    rdfs:label "강섬유"@ko ;
+    rdfs:label "Steel Fiber"@en ;
+    rdfs:comment "숏크리트 보강용 강섬유"@ko .
+
+:Accelerator a owl:Class ;
+    rdfs:subClassOf :Material ;
+    rdfs:label "급결제"@ko ;
+    rdfs:label "Accelerator"@en ;
+    rdfs:comment "콘크리트 급속 경화제"@ko .
+
+:Admixture a owl:Class ;
+    rdfs:subClassOf :Material ;
+    rdfs:label "혼화제"@ko ;
+    rdfs:label "Admixture"@en ;
+    rdfs:comment "콘크리트 성능 개선 첨가제"@ko .
+
+:Aggregate a owl:Class ;
+    rdfs:subClassOf :Material ;
+    rdfs:label "골재"@ko ;
+    rdfs:label "Aggregate"@en ;
+    rdfs:comment "숏크리트용 골재"@ko .
+
+## 시공 활동
+
+:ShotcreteConstruction a owl:Class ;
+    rdfs:subClassOf :Task ;
+    rdfs:label "숏크리트 시공"@ko ;
+    rdfs:label "Shotcrete Construction"@en ;
+    rdfs:comment "숏크리트 타설 작업"@ko .
+
+:SealingProcess a owl:Class ;
+    rdfs:subClassOf :MainProcess ;
+    rdfs:label "막장 막기(Sealing)"@ko ;
+    rdfs:label "Sealing Process"@en ;
+    rdfs:comment "터널 막장면 보호를 위한 Sealing 공정"@ko .
+
+## 위반 사항
+
+:Violation a owl:Class ;
+    rdfs:label "위반 사항"@ko ;
+    rdfs:label "Violation"@en ;
+    rdfs:comment "공정 또는 품질 기준 위반"@ko .
+
+:QualityViolation a owl:Class ;
+    rdfs:subClassOf :Violation ;
+    rdfs:label "품질 위반"@ko ;
+    rdfs:label "Quality Violation"@en .
+
+:PrerequisiteViolation a owl:Class ;
+    rdfs:subClassOf :Violation ;
+    rdfs:label "선행 조건 위반"@ko ;
+    rdfs:label "Prerequisite Violation"@en .
+
+# ============================================
+# Object Properties (객체 속성)
+# ============================================
+
+:hasParent a owl:ObjectProperty ;
+    rdfs:label "상위 프로세스"@ko ;
+    rdfs:label "has parent"@en ;
+    rdfs:comment "계층 구조에서 상위 프로세스를 참조"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :ProcessActivity .
+
+:hasChild a owl:ObjectProperty ;
+    rdfs:label "하위 프로세스"@ko ;
+    rdfs:label "has child"@en ;
+    rdfs:comment "계층 구조에서 하위 프로세스를 참조 (hasParent의 역관계)"@ko ;
+    owl:inverseOf :hasParent ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :ProcessActivity .
+
+:hasPreviousStep a owl:ObjectProperty ;
+    rdfs:label "이전 단계"@ko ;
+    rdfs:label "has previous step"@en ;
+    rdfs:comment "순차적으로 이전에 실행되는 단계"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :ProcessActivity .
+
+:hasNextStep a owl:ObjectProperty ;
+    rdfs:label "다음 단계"@ko ;
+    rdfs:label "has next step"@en ;
+    rdfs:comment "순차적으로 다음에 실행되는 단계 (hasPreviousStep의 역관계)"@ko ;
+    owl:inverseOf :hasPreviousStep ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :ProcessActivity .
+
+:requiresMaterial a owl:ObjectProperty ;
+    rdfs:label "필요 자재"@ko ;
+    rdfs:label "requires material"@en ;
+    rdfs:comment "활동 수행에 필요한 자재"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :Material .
+
+:performsQualityCheck a owl:ObjectProperty ;
+    rdfs:label "품질 검사 수행"@ko ;
+    rdfs:label "performs quality check"@en ;
+    rdfs:comment "수행하는 품질 검사 활동"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :QualityControl .
+
+:belongsToProcess a owl:ObjectProperty ;
+    rdfs:label "소속 프로세스"@ko ;
+    rdfs:label "belongs to process"@en ;
+    rdfs:comment "상위 계층의 어떤 프로세스에 속하는지 (추론 가능)"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :MainProcess ;
+    a owl:TransitiveProperty .
+
+:hasQualityViolation a owl:ObjectProperty ;
+    rdfs:label "품질 위반 보유"@ko ;
+    rdfs:label "has quality violation"@en ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :QualityViolation .
+
+:hasPrerequisiteViolation a owl:ObjectProperty ;
+    rdfs:label "선행 조건 위반 보유"@ko ;
+    rdfs:label "has prerequisite violation"@en ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range :PrerequisiteViolation .
+
+# ============================================
+# Datatype Properties (데이터 속성)
+# ============================================
+
+:uid a owl:DatatypeProperty ;
+    rdfs:label "고유 식별자"@ko ;
+    rdfs:label "UID"@en ;
+    rdfs:comment "DGraph에서 사용하는 16진수 고유 식별자 (예: 0x6f7e)"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range xsd:string .
+
+:activityID a owl:DatatypeProperty ;
+    rdfs:label "활동 ID"@ko ;
+    rdfs:label "Activity ID"@en ;
+    rdfs:comment "활동의 고유 번호 또는 코드 (예: 131, h-4-2-1)"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range xsd:string .
+
+:activityName a owl:DatatypeProperty ;
+    rdfs:label "활동명"@ko ;
+    rdfs:label "Activity Name"@en ;
+    rdfs:comment "활동의 이름 (예: 뜬돌제거, 숏크리트 타설)"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range xsd:string .
+
+:sequenceOrder a owl:DatatypeProperty ;
+    rdfs:label "실행 순서"@ko ;
+    rdfs:label "Sequence Order"@en ;
+    rdfs:comment "동일 계층 내에서의 실행 순서 번호"@ko ;
+    rdfs:domain :ProcessActivity ;
+    rdfs:range xsd:integer .
+
+:violationType a owl:DatatypeProperty ;
+    rdfs:label "위반 유형"@ko ;
+    rdfs:label "Violation Type"@en ;
+    rdfs:comment "위반의 구체적 유형 (예: MissingInspection, MaterialNotInspected)"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:string .
+
+:violationMessage a owl:DatatypeProperty ;
+    rdfs:label "위반 메시지"@ko ;
+    rdfs:label "Violation Message"@en ;
+    rdfs:comment "위반에 대한 상세 설명 메시지"@ko ;
+    rdfs:domain :Violation ;
+    rdfs:range xsd:string .
+
+# ============================================
+# 추가 제약 조건 (Axioms)
+# ============================================
+
+# 프로세스는 반드시 activityName을 가져야 함
+:ProcessActivity rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :activityName ;
+    owl:minCardinality 1
+] .
+
+# 프로세스는 반드시 activityID를 가져야 함
+:ProcessActivity rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :activityID ;
+    owl:minCardinality 1
+] .
+
+# ============================================
+# 명명된 개체 (Named Individuals)
+# ============================================
+
+# 일반적인 위반 유형들을 개체로 정의
+:MissingInspectionViolation a :QualityViolation ;
+    rdfs:label "검사 누락 위반"@ko ;
+    :violationType "MissingInspection" ;
+    :violationMessage "필수 품질 검사가 누락되었습니다"@ko .
+
+:MaterialNotInspectedViolation a :PrerequisiteViolation ;
+    rdfs:label "자재 미검사 위반"@ko ;
+    :violationType "MaterialNotInspected" ;
+    :violationMessage "시공 전 자재 검사가 완료되지 않았습니다"@ko .
+
+:SequenceViolation a :PrerequisiteViolation ;
+    rdfs:label "순서 위반"@ko ;
+    :violationType "SequenceViolation" ;
+    :violationMessage "공정 순서가 잘못되었습니다"@ko .

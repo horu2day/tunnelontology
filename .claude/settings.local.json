@@ -42,7 +42,9 @@
       "Bash(curl -s http://127.0.0.1:8080/usecases.html)",
       "Bash(curl -s http://127.0.0.1:8080/usecases.html -o temp_usecases_check.html)",
       "Bash(del temp_usecases_check.html)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

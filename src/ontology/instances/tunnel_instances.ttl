@@ -1,0 +1,222 @@
+# Tunnel Excavation Instance Data
+# 이 파일은 터널 굴착 온톨로지 스키마를 기반으로 실제 사이클 데이터를 표현합니다.
+
+# -- 접두사(Prefix) 정의 (스키마와 동일) --
+@prefix : <http://example.org/tunneling-ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ========== 사이클 001 (Cycle 001) ==========
+
+:cycle001 rdf:type :TunnelingCycle ;
+    :cycleNumber 1 ;
+    :advanceLength "1.2"^^xsd:decimal ;
+    :hasStage :drilling_c001, :charging_c001, :blasting_c001,
+              :ventilation_c001, :mucking_c001, :support_c001 .
+
+# --- 단계 1: 천공 (Drilling) ---
+:drilling_c001 rdf:type :Drilling ;
+    :startTime "2025-01-11T08:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T10:30:00Z"^^xsd:dateTime ;
+    :usesEquipment :drillMachine_J01 ;
+    :createsHole :hole_c001_cut01, :hole_c001_cut02,
+                 :hole_c001_perim01, :hole_c001_perim02,
+                 :hole_c001_helper01 .
+
+# --- 단계 2: 장약 (Charging) ---
+:charging_c001 rdf:type :Charging ;
+    :startTime "2025-01-11T10:45:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T11:30:00Z"^^xsd:dateTime .
+
+# --- 단계 3: 발파 (Blasting) ---
+:blasting_c001 rdf:type :Blasting ;
+    :startTime "2025-01-11T11:45:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T11:47:00Z"^^xsd:dateTime ;
+    :detonates :explosive_c001_01, :explosive_c001_02 .
+
+# --- 단계 4: 환기 (Ventilation) ---
+:ventilation_c001 rdf:type :Ventilation ;
+    :startTime "2025-01-11T11:50:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T12:50:00Z"^^xsd:dateTime .
+
+# --- 단계 5: 버력처리 (Mucking) ---
+:mucking_c001 rdf:type :Mucking ;
+    :startTime "2025-01-11T13:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T15:00:00Z"^^xsd:dateTime ;
+    :removesDebris :loader_L01 .
+
+# --- 단계 6: 지보재 설치 (Support Installation) ---
+:support_c001 rdf:type :SupportInstallation ;
+    :startTime "2025-01-11T15:15:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-11T17:30:00Z"^^xsd:dateTime ;
+    :installsSupport :shotcrete_c001, :rockbolt_c001_01, :rockbolt_c001_02 .
+
+# --- 천공 구멍 객체들 ---
+:hole_c001_cut01 rdf:type :CutHole ;
+    :holeDepth "3.5"^^xsd:decimal ;
+    :holeType "심빼기공" ;
+    :isChargedWith :explosive_c001_01 .
+
+:hole_c001_cut02 rdf:type :CutHole ;
+    :holeDepth "3.5"^^xsd:decimal ;
+    :holeType "심빼기공" ;
+    :isChargedWith :explosive_c001_02 .
+
+:hole_c001_perim01 rdf:type :PerimeterHole ;
+    :holeDepth "3.0"^^xsd:decimal ;
+    :holeType "주변공" .
+
+:hole_c001_perim02 rdf:type :PerimeterHole ;
+    :holeDepth "3.0"^^xsd:decimal ;
+    :holeType "주변공" .
+
+:hole_c001_helper01 rdf:type :HelperHole ;
+    :holeDepth "3.2"^^xsd:decimal ;
+    :holeType "보조공" .
+
+# --- 폭약 객체들 ---
+:explosive_c001_01 rdf:type :Explosive .
+:explosive_c001_02 rdf:type :Explosive .
+
+# --- 장비 객체들 ---
+:drillMachine_J01 rdf:type :DrillingMachine ;
+    :equipmentId "DRILL-J01" .
+
+:loader_L01 rdf:type :Loader ;
+    :equipmentId "LOADER-L01" .
+
+# --- 지보재 객체들 ---
+:shotcrete_c001 rdf:type :Shotcrete ;
+    :shotcreteThickness "150.0"^^xsd:decimal .
+
+:rockbolt_c001_01 rdf:type :RockBolt ;
+    :boltLength "4.0"^^xsd:decimal .
+
+:rockbolt_c001_02 rdf:type :RockBolt ;
+    :boltLength "4.0"^^xsd:decimal .
+
+
+# ========== 사이클 002 (Cycle 002) ==========
+
+:cycle002 rdf:type :TunnelingCycle ;
+    :cycleNumber 2 ;
+    :advanceLength "1.3"^^xsd:decimal ;
+    :hasStage :drilling_c002, :charging_c002, :blasting_c002,
+              :ventilation_c002, :mucking_c002, :support_c002 .
+
+# --- 단계 1: 천공 (Drilling) ---
+:drilling_c002 rdf:type :Drilling ;
+    :startTime "2025-01-12T08:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T10:20:00Z"^^xsd:dateTime ;
+    :usesEquipment :drillMachine_J01 ;
+    :createsHole :hole_c002_cut01, :hole_c002_perim01 .
+
+# --- 단계 2: 장약 (Charging) ---
+:charging_c002 rdf:type :Charging ;
+    :startTime "2025-01-12T10:35:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T11:20:00Z"^^xsd:dateTime .
+
+# --- 단계 3: 발파 (Blasting) ---
+:blasting_c002 rdf:type :Blasting ;
+    :startTime "2025-01-12T11:35:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T11:37:00Z"^^xsd:dateTime ;
+    :detonates :explosive_c002_01 .
+
+# --- 단계 4: 환기 (Ventilation) ---
+:ventilation_c002 rdf:type :Ventilation ;
+    :startTime "2025-01-12T11:40:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T12:40:00Z"^^xsd:dateTime .
+
+# --- 단계 5: 버력처리 (Mucking) ---
+:mucking_c002 rdf:type :Mucking ;
+    :startTime "2025-01-12T12:50:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T14:40:00Z"^^xsd:dateTime ;
+    :removesDebris :loader_L01 .
+
+# --- 단계 6: 지보재 설치 (Support Installation) ---
+:support_c002 rdf:type :SupportInstallation ;
+    :startTime "2025-01-12T15:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-12T17:00:00Z"^^xsd:dateTime ;
+    :installsSupport :shotcrete_c002, :rockbolt_c002_01 .
+
+# --- 천공 구멍 객체들 ---
+:hole_c002_cut01 rdf:type :CutHole ;
+    :holeDepth "3.6"^^xsd:decimal ;
+    :holeType "심빼기공" ;
+    :isChargedWith :explosive_c002_01 .
+
+:hole_c002_perim01 rdf:type :PerimeterHole ;
+    :holeDepth "3.1"^^xsd:decimal ;
+    :holeType "주변공" .
+
+# --- 폭약 객체들 ---
+:explosive_c002_01 rdf:type :Explosive .
+
+# --- 지보재 객체들 ---
+:shotcrete_c002 rdf:type :Shotcrete ;
+    :shotcreteThickness "150.0"^^xsd:decimal .
+
+:rockbolt_c002_01 rdf:type :RockBolt ;
+    :boltLength "4.5"^^xsd:decimal .
+
+
+# ========== 사이클 003 (Cycle 003) ==========
+
+:cycle003 rdf:type :TunnelingCycle ;
+    :cycleNumber 3 ;
+    :advanceLength "1.1"^^xsd:decimal ;
+    :hasStage :drilling_c003, :charging_c003, :blasting_c003,
+              :ventilation_c003, :mucking_c003, :support_c003 .
+
+# --- 단계 1: 천공 (Drilling) ---
+:drilling_c003 rdf:type :Drilling ;
+    :startTime "2025-01-13T08:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T10:40:00Z"^^xsd:dateTime ;
+    :usesEquipment :drillMachine_J01 ;
+    :createsHole :hole_c003_cut01 .
+
+# --- 단계 2: 장약 (Charging) ---
+:charging_c003 rdf:type :Charging ;
+    :startTime "2025-01-13T10:55:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T11:40:00Z"^^xsd:dateTime .
+
+# --- 단계 3: 발파 (Blasting) ---
+:blasting_c003 rdf:type :Blasting ;
+    :startTime "2025-01-13T11:55:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T11:57:00Z"^^xsd:dateTime ;
+    :detonates :explosive_c003_01 .
+
+# --- 단계 4: 환기 (Ventilation) ---
+:ventilation_c003 rdf:type :Ventilation ;
+    :startTime "2025-01-13T12:00:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T13:00:00Z"^^xsd:dateTime .
+
+# --- 단계 5: 버력처리 (Mucking) ---
+:mucking_c003 rdf:type :Mucking ;
+    :startTime "2025-01-13T13:10:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T15:10:00Z"^^xsd:dateTime ;
+    :removesDebris :loader_L01 .
+
+# --- 단계 6: 지보재 설치 (Support Installation) ---
+:support_c003 rdf:type :SupportInstallation ;
+    :startTime "2025-01-13T15:25:00Z"^^xsd:dateTime ;
+    :endTime "2025-01-13T17:45:00Z"^^xsd:dateTime ;
+    :installsSupport :shotcrete_c003, :rockbolt_c003_01, :lattice_c003_01 .
+
+# --- 천공 구멍 객체들 ---
+:hole_c003_cut01 rdf:type :CutHole ;
+    :holeDepth "3.4"^^xsd:decimal ;
+    :holeType "심빼기공" ;
+    :isChargedWith :explosive_c003_01 .
+
+# --- 폭약 객체들 ---
+:explosive_c003_01 rdf:type :Explosive .
+
+# --- 지보재 객체들 ---
+:shotcrete_c003 rdf:type :Shotcrete ;
+    :shotcreteThickness "160.0"^^xsd:decimal .
+
+:rockbolt_c003_01 rdf:type :RockBolt ;
+    :boltLength "4.2"^^xsd:decimal .
+
+:lattice_c003_01 rdf:type :LatticeGirder .

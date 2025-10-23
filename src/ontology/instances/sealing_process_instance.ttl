@@ -1,0 +1,352 @@
+@prefix : <http://example.org/tunnel-ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# Sealing(N) 프로세스 인스턴스 데이터
+# ============================================
+
+# 메인 프로세스: h.Sealing(N)
+:Activity_131 a :SealingProcess , :MainProcess ;
+    :uid "0x6f7e" ;
+    :activityID "131" ;
+    :activityName "h.Sealing(N)" ;
+    rdfs:label "막장 막기(Sealing) 공정"@ko ;
+    rdfs:comment "터널 막장면 보호를 위한 전체 Sealing 공정"@ko .
+
+# h-1. 뜬돌제거
+:Activity_132 a :Task ;
+    :uid "0x6f0b" ;
+    :activityID "132" ;
+    :activityName "h-1.뜬돌제거" ;
+    rdfs:label "뜬돌제거"@ko ;
+    :hasParent :Activity_131 ;
+    :sequenceOrder 1 .
+
+# h-2. 측량 및 여굴량 확인
+:Activity_133 a :Task ;
+    :uid "0x6ee3" ;
+    :activityID "133" ;
+    :activityName "h-2.측량 및 여굴량 확인" ;
+    rdfs:label "측량 및 여굴량 확인"@ko ;
+    :hasParent :Activity_131 ;
+    :hasPreviousStep :Activity_132 ;
+    :sequenceOrder 2 .
+
+# h-3. 선형, 내공단면 확인
+:Activity_134 a :Task ;
+    :uid "0x6eda" ;
+    :activityID "134" ;
+    :activityName "h-3.선형, 내공단면 확인" ;
+    rdfs:label "선형, 내공단면 확인"@ko ;
+    :hasParent :Activity_131 ;
+    :hasPreviousStep :Activity_133 ;
+    :sequenceOrder 3 .
+
+# h-4. Sealing(N) 하위 프로세스
+:Activity_135 a :SubProcess ;
+    :uid "0x6f2d" ;
+    :activityID "135" ;
+    :activityName "h-4.Sealing(N)" ;
+    rdfs:label "Sealing(N) 세부 공정"@ko ;
+    :hasParent :Activity_131 ;
+    :hasPreviousStep :Activity_134 ;
+    :sequenceOrder 4 .
+
+# ============================================
+# h-4-1. Sealing 방법 선택
+# ============================================
+
+:Activity_136 a :Task ;
+    :uid "0x6f0e" ;
+    :activityID "136" ;
+    :activityName "h-4-1.Sealing 방법 선택" ;
+    rdfs:label "Sealing 방법 선택"@ko ;
+    :hasParent :Activity_135 ;
+    :sequenceOrder 1 .
+
+# ============================================
+# h-4-2. 사전조치(숏크리트)
+# ============================================
+
+:Activity_137 a :PreparationActivity ;
+    :uid "0x6f3f" ;
+    :activityID "137" ;
+    :activityName "h-4-2.사전조치(숏크리트)" ;
+    rdfs:label "사전조치(숏크리트)"@ko ;
+    :hasParent :Activity_135 ;
+    :hasPreviousStep :Activity_136 ;
+    :sequenceOrder 2 .
+
+:Activity_138 a :Step ;
+    :uid "0x6eeb" ;
+    :activityID "138" ;
+    :activityName "h-4-2-1.시공계획서 작성 및 제출" ;
+    rdfs:label "시공계획서 작성 및 제출"@ko ;
+    :hasParent :Activity_137 ;
+    :sequenceOrder 1 .
+
+:Activity_139 a :Step ;
+    :uid "0x6f4b" ;
+    :activityID "139" ;
+    :activityName "h-4-2-2.숏크리트 배합 설계 및 보고" ;
+    rdfs:label "숏크리트 배합 설계 및 보고"@ko ;
+    :hasParent :Activity_137 ;
+    :hasPreviousStep :Activity_138 ;
+    :sequenceOrder 2 .
+
+:Activity_140 a :Step ;
+    :uid "0x6eec" ;
+    :activityID "140" ;
+    :activityName "h-4-2-3.자재 공급원 승인 확인" ;
+    rdfs:label "자재 공급원 승인 확인"@ko ;
+    :hasParent :Activity_137 ;
+    :hasPreviousStep :Activity_139 ;
+    :sequenceOrder 3 .
+
+:Activity_141 a :Step ;
+    :uid "0x6f6f" ;
+    :activityID "141" ;
+    :activityName "h-4-2-4.품질협의체 회의" ;
+    rdfs:label "품질협의체 회의"@ko ;
+    :hasParent :Activity_137 ;
+    :hasPreviousStep :Activity_140 ;
+    :sequenceOrder 4 .
+
+:Activity_142 a :Step ;
+    :uid "0x6f40" ;
+    :activityID "142" ;
+    :activityName "h-4-2-5.근로자 교육" ;
+    rdfs:label "근로자 교육"@ko ;
+    :hasParent :Activity_137 ;
+    :hasPreviousStep :Activity_141 ;
+    :sequenceOrder 5 .
+
+# ============================================
+# h-4-3. 자재검사
+# ============================================
+
+:Activity_143 a :MaterialInspection ;
+    :uid "0x6f53" ;
+    :activityID "143" ;
+    :activityName "h-4-3.자재검사" ;
+    rdfs:label "자재검사"@ko ;
+    :hasParent :Activity_135 ;
+    :hasPreviousStep :Activity_137 ;
+    :sequenceOrder 3 .
+
+:Activity_144 a :Step ;
+    :uid "0x6f4f" ;
+    :activityID "144" ;
+    :activityName "h-4-3-1.숏크리트용 골재 품질기준 확인" ;
+    rdfs:label "숏크리트용 골재 품질기준 확인"@ko ;
+    :hasParent :Activity_143 ;
+    :requiresMaterial :ShotcreteAggregate ;
+    :sequenceOrder 1 .
+
+:Activity_145 a :Step ;
+    :uid "0x6f4c" ;
+    :activityID "145" ;
+    :activityName "h-4-3-2.강섬유 품질기준" ;
+    rdfs:label "강섬유 품질기준 확인"@ko ;
+    :hasParent :Activity_143 ;
+    :hasPreviousStep :Activity_144 ;
+    :requiresMaterial :SteelFiberMaterial ;
+    :sequenceOrder 2 .
+
+:Activity_146 a :Step ;
+    :uid "0x6ef9" ;
+    :activityID "146" ;
+    :activityName "h-4-3-3.급결제 품질기준" ;
+    rdfs:label "급결제 품질기준 확인"@ko ;
+    :hasParent :Activity_143 ;
+    :hasPreviousStep :Activity_145 ;
+    :requiresMaterial :AcceleratorMaterial ;
+    :sequenceOrder 3 .
+
+:Activity_147 a :Step ;
+    :uid "0x6f70" ;
+    :activityID "147" ;
+    :activityName "h-4-3-4.혼화제 품질기준" ;
+    rdfs:label "혼화제 품질기준 확인"@ko ;
+    :hasParent :Activity_143 ;
+    :hasPreviousStep :Activity_146 ;
+    :requiresMaterial :AdmixtureMaterial ;
+    :sequenceOrder 4 .
+
+# ============================================
+# h-4-4. 시공 전 조치
+# ============================================
+
+:Activity_148 a :PreparationActivity ;
+    :uid "0x6eb8" ;
+    :activityID "148" ;
+    :activityName "h-4-4.시공 전 조치" ;
+    rdfs:label "시공 전 조치"@ko ;
+    :hasParent :Activity_135 ;
+    :hasPreviousStep :Activity_143 ;
+    :sequenceOrder 4 .
+
+:Activity_149 a :Step ;
+    :uid "0x6edb" ;
+    :activityID "149" ;
+    :activityName "h-4-4-1.타설면 정리" ;
+    rdfs:label "타설면 정리"@ko ;
+    :hasParent :Activity_148 ;
+    :sequenceOrder 1 .
+
+:Activity_150 a :Step ;
+    :uid "0x6f0f" ;
+    :activityID "150" ;
+    :activityName "h-4-4-2.용수발생시 배수처리" ;
+    rdfs:label "용수발생시 배수처리"@ko ;
+    :hasParent :Activity_148 ;
+    :hasPreviousStep :Activity_149 ;
+    :sequenceOrder 2 .
+
+:Activity_151 a :Step ;
+    :uid "0x6f62" ;
+    :activityID "151" ;
+    :activityName "h-4-4-3.강섬유숏크리트 시험 시공" ;
+    rdfs:label "강섬유숏크리트 시험 시공"@ko ;
+    :hasParent :Activity_148 ;
+    :hasPreviousStep :Activity_150 ;
+    :sequenceOrder 3 .
+
+:Activity_152 a :Step ;
+    :uid "0x6edc" ;
+    :activityID "152" ;
+    :activityName "h-4-4-4.시험배합 실시 및 확인" ;
+    rdfs:label "시험배합 실시 및 확인"@ko ;
+    :hasParent :Activity_148 ;
+    :hasPreviousStep :Activity_151 ;
+    :sequenceOrder 4 .
+
+# ============================================
+# h-4-5. 숏크리트 시공
+# ============================================
+
+:Activity_153 a :ShotcreteConstruction ;
+    :uid "0x6eaf" ;
+    :activityID "153" ;
+    :activityName "h-4-5.숏크리트 시공" ;
+    rdfs:label "숏크리트 시공"@ko ;
+    :hasParent :Activity_135 ;
+    :hasPreviousStep :Activity_148 ;
+    :requiresMaterial :ShotcreteMaterial ;
+    :sequenceOrder 5 .
+
+:Activity_154 a :Step ;
+    :uid "0x6f10" ;
+    :activityID "154" ;
+    :activityName "h-4-5-1.숏크리트 타설" ;
+    rdfs:label "숏크리트 타설"@ko ;
+    :hasParent :Activity_153 ;
+    :sequenceOrder 1 .
+
+:Activity_155 a :Step ;
+    :uid "0x6edd" ;
+    :activityID "155" ;
+    :activityName "h-4-5-2.숏크리트 리바운드량 확인 및 제거" ;
+    rdfs:label "숏크리트 리바운드량 확인 및 제거"@ko ;
+    :hasParent :Activity_153 ;
+    :hasPreviousStep :Activity_154 ;
+    :sequenceOrder 2 .
+
+:Activity_156 a :Step ;
+    :uid "0x6f11" ;
+    :activityID "156" ;
+    :activityName "h-4-5-3.숏크리트 이음부 처리" ;
+    rdfs:label "숏크리트 이음부 처리"@ko ;
+    :hasParent :Activity_153 ;
+    :hasPreviousStep :Activity_155 ;
+    :sequenceOrder 3 .
+
+# ============================================
+# h-4-6. 숏크리트 시공상태 확인 (품질검사)
+# ============================================
+
+:Activity_157 a :CompletionInspection ;
+    :uid "0x6ef0" ;
+    :activityID "157" ;
+    :activityName "h-4-6.숏크리트 시공상태 확인" ;
+    rdfs:label "숏크리트 시공상태 확인"@ko ;
+    :hasParent :Activity_135 ;
+    :hasPreviousStep :Activity_153 ;
+    :sequenceOrder 6 .
+
+:Activity_158 a :Step ;
+    :uid "0x6f63" ;
+    :activityID "158" ;
+    :activityName "h-4-6-1.강도 확인(일반)" ;
+    rdfs:label "강도 확인(일반)"@ko ;
+    :hasParent :Activity_157 ;
+    :sequenceOrder 1 .
+
+:Activity_159 a :Step ;
+    :uid "0x6f1a" ;
+    :activityID "159" ;
+    :activityName "h-4-6-2.강도 확인(강섬유)" ;
+    rdfs:label "강도 확인(강섬유)"@ko ;
+    :hasParent :Activity_157 ;
+    :hasPreviousStep :Activity_158 ;
+    :sequenceOrder 2 .
+
+:Activity_160 a :Step ;
+    :uid "0x6ec0" ;
+    :activityID "160" ;
+    :activityName "h-4-6-3.휨인성 확인(강섬유)" ;
+    rdfs:label "휨인성 확인(강섬유)"@ko ;
+    :hasParent :Activity_157 ;
+    :hasPreviousStep :Activity_159 ;
+    :sequenceOrder 3 .
+
+:Activity_161 a :Step ;
+    :uid "0x6f54" ;
+    :activityID "161" ;
+    :activityName "h-4-6-4.강섬유 혼입량 확인" ;
+    rdfs:label "강섬유 혼입량 확인"@ko ;
+    :hasParent :Activity_157 ;
+    :hasPreviousStep :Activity_160 ;
+    :sequenceOrder 4 .
+
+:Activity_162 a :Step ;
+    :uid "0x6eb9" ;
+    :activityID "162" ;
+    :activityName "h-4-6-5.숏크리트 마무리면 확인" ;
+    rdfs:label "숏크리트 마무리면 확인"@ko ;
+    :hasParent :Activity_157 ;
+    :hasPreviousStep :Activity_161 ;
+    :sequenceOrder 5 .
+
+:Activity_163 a :Step ;
+    :uid "0x6f25" ;
+    :activityID "163" ;
+    :activityName "h-4-6-6.숏크리트 두께 확인" ;
+    rdfs:label "숏크리트 두께 확인"@ko ;
+    :hasParent :Activity_157 ;
+    :hasPreviousStep :Activity_162 ;
+    :sequenceOrder 6 .
+
+# ============================================
+# 자재 인스턴스 (Materials)
+# ============================================
+
+:ShotcreteMaterial a :Shotcrete ;
+    rdfs:label "숏크리트 자재"@ko ;
+    rdfs:comment "막장 Sealing용 숏크리트"@ko .
+
+:ShotcreteAggregate a :Aggregate ;
+    rdfs:label "숏크리트용 골재"@ko .
+
+:SteelFiberMaterial a :SteelFiber ;
+    rdfs:label "강섬유 자재"@ko ;
+    rdfs:comment "숏크리트 보강용 강섬유"@ko .
+
+:AcceleratorMaterial a :Accelerator ;
+    rdfs:label "급결제 자재"@ko .
+
+:AdmixtureMaterial a :Admixture ;
+    rdfs:label "혼화제 자재"@ko .

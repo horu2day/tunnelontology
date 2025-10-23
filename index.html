@@ -66,6 +66,10 @@
                     <h3>범례</h3>
                     <div class="legend-items">
                         <div class="legend-item">
+                            <span class="legend-icon instance-icon"></span>
+                            <span>인스턴스 (Instance)</span>
+                        </div>
+                        <div class="legend-item">
                             <span class="legend-icon class-icon"></span>
                             <span>클래스 (Class)</span>
                         </div>
@@ -100,7 +104,7 @@
 
     <!-- JavaScript 모듈 로드 -->
     <script type="module">
-        import { parseTurtleFile } from './src/parsers/turtle-parser.js';
+        import { parseMultipleTurtleFiles } from './src/parsers/turtle-parser.js';
         import { renderOntologyGraph } from './src/visualizers/ontology-graph.js';
         import { toggleLoading, showError } from './src/utils/formatters.js';
 
@@ -113,9 +117,12 @@
             try {
                 toggleLoading(true);
 
-                // 1. 온톨로지 스키마 로드
-                console.log('Loading ontology schema...');
-                const { store, prefixes } = await parseTurtleFile('src/ontology/tunneling_schema.ttl');
+                // 1. 온톨로지 스키마와 인스턴스 로드
+                console.log('Loading ontology data...');
+                const { store, prefixes } = await parseMultipleTurtleFiles([
+                    'src/ontology/tunneling_schema.ttl',
+                    'src/ontology/tunnel_instances.ttl'
+                ]);
 
                 // 2. 클래스 계층 렌더링
                 console.log('Rendering class hierarchy...');

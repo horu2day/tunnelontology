@@ -290,3 +290,7 @@
     font-size: 11px;
   }
 }
+
+.legend-icon.instance-icon {
+    background-color: #e74c3c;
+}

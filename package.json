@@ -4,7 +4,7 @@
   "description": "NATM Tunnel Excavation Ontology & Visualization System",
   "main": "index.html",
   "scripts": {
-    "dev": "http-server -p 8080 -o",
+    "dev": "http-server -p 8081 -o -c-1",
     "lint": "eslint src/**/*.js",
     "test": "echo \"No tests configured yet\" && exit 0"
   },
